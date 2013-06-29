@@ -1,6 +1,15 @@
 #include <multiboot.h> // multiboot_...
 #include <types.h> // iN, uN
 
-void k_main(multiboot_header_t mb_header, u32 mb_magic) {  
+#include <mm/pmm.h>
+
+void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
+  if(mb_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
+    // k_printf HAALP
+    for(;;);
+  }
+  
+  pmm_setup(mb_info->mmap_addr, mb_info->mmap_length);
+  
   for(;;);
 }
