@@ -1,7 +1,7 @@
 include ../general.rules
 
-C_SRCS=utils.c
-OBJS=utils.o
+C_SRCS=utils.c mm/pmm.c
+OBJS=utils.o mm/pmm.o
 
 .PHONY: all
 	
@@ -11,5 +11,5 @@ OBJS=utils.o
 all: $(OBJS)	
 	
 clean:
-	$(RM) -f *.o
+	$(RM) -f $(OBJS)
 	

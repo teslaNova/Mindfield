@@ -3,7 +3,7 @@ include ../../general.rules
 
 C_SRCS=main.c
 ASM_SRCS=init.asm
-OBJS=init.o main.o ../utils.o
+OBJS=init.o main.o ../mm/pmm.o ../utils.o
 
 .PHONY: all
 
