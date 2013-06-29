@@ -8,7 +8,7 @@ SH=`which sh`
 RM=`which rm`
 CP=`which cp`
 
-CFLAGS=-nostdinc -nostdlib -O0 -I ../../include -I ../include -m32 -c -fno-stack-protector -fno-builtin -fleading-underscore -masm=intel
+CFLAGS=-nostdinc -nostdlib -O0 -I ../../include -I ../include -I ./include -c -fno-stack-protector -fno-builtin -fleading-underscore -masm=intel
 LDFLAGS=-T ../kernel.ld -L/usr/local/lib
 ASFLAGS=-f elf
 
@@ -16,3 +16,8 @@ BIN=bin
 
 KRNL=mindfield
 MAP=info
+
+#ENV BASE RULES
+ifeq ($(ARCH),x86)
+	CFLAGS += -m32
+endif
