@@ -19,6 +19,7 @@ void *memmove(void *dest, const void *src, u32 n) {
 int memcmp(void *l1, void *l2, u32 len) {
   while(l1 && l2 && len--) {
     if(*(u8*)l1 == *(u8*)l2) {
+      l1++; l2++;
       continue;
     }
     
