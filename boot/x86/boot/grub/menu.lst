@@ -1,5 +1,5 @@
 default 0
 timeout 0
 
-title unnamed
-kernel /boot/unnamed
+title mindfield
+kernel /boot/mindfield

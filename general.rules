@@ -14,5 +14,5 @@ ASFLAGS=-f elf
 
 BIN=bin
 
-KRNL=unnamed
+KRNL=mindfield
 MAP=info
