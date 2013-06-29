@@ -13,4 +13,4 @@ x86-clean:
 	$(MAKE) -wC kernel clean
 	$(MAKE) -wC kernel/x86/kernel clean
 	
-clean: x86_clean
+clean: x86-clean
