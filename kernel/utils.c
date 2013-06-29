@@ -4,7 +4,7 @@
   cpu-check: sseX */
 
 void *memcpy(void *dest, const void *src, u32 n) {
-  while(dest && src && n-- != (u32)-1) {
+  while(dest && src && n--) {
     *(u8*)dest++ = *(u8*)src++;
   }
   
@@ -17,7 +17,7 @@ void *memmove(void *dest, const void *src, u32 n) {
 }
 
 int memcmp(void *l1, void *l2, u32 len) {
-  while(l1 && l2 && len-- != (u32)-1) {
+  while(l1 && l2 && len--) {
     if(*(u8*)l1 == *(u8*)l2) {
       continue;
     }
@@ -33,7 +33,7 @@ int memcmp(void *l1, void *l2, u32 len) {
 }
 
 const void *memchr(const void *t, u32 v, u32 n) {
-  while(t && n-- != (u32)-1) {
+  while(t && n--) {
     if(*(u8*)t++ == (u8)(v & 0x0FF)) {
       return t;
     }
@@ -43,7 +43,7 @@ const void *memchr(const void *t, u32 v, u32 n) {
 }
 
 void *memset(void *dest, u32 v, u32 n) {
-  while(dest && n-- != (u32)-1) {
+  while(dest && n--) {
     *(u8*)dest++ = (u8)(v & 0x0FF);
   }
   
