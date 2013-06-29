@@ -2,6 +2,7 @@ include kernel/x86/x86.rules
 include general.rules
 
 x86-all:
+	$(MAKE) -wC kernel all
 	$(MAKE) -wC kernel/x86/kernel
 	$(RM) -f ./boot/$(KRNL)
 	$(CP) $(BIN)/x86/$(KRNL) ./boot/x86/boot/$(KRNL)
@@ -9,6 +10,7 @@ x86-all:
 	 
 x86-clean:
 	$(RM) -f $(BIN)/x86/$(KRNL).iso
+	$(MAKE) -wC kernel clean
 	$(MAKE) -wC kernel/x86/kernel clean
 	
 clean: x86_clean
