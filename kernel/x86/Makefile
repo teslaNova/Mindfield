@@ -1,9 +1,9 @@
-include ../x86.rules
-include ../../../general.rules
+include x86.rules
+include ../../general.rules
 
 C_SRCS=main.c
 ASM_SRCS=init.asm
-OBJS=init.o main.o ../../utils.o
+OBJS=init.o main.o ../utils.o
 
 .PHONY: all
 

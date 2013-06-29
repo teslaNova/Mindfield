@@ -1,2 +1,2 @@
-BIN_x86_KRNL=../../../$(BIN)/x86/$(KRNL)
-BIN_x86_MAP=../../../$(BIN)/x86/$(MAP)
+BIN_x86_KRNL=../../$(BIN)/x86/$(KRNL)
+BIN_x86_MAP=../../$(BIN)/x86/$(MAP)
