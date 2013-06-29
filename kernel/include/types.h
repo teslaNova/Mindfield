@@ -13,4 +13,12 @@ typedef short i16;
 typedef int i32;
 typedef long long int i64;
 
+typedef u32 paddr_t;
+typedef u32 vaddr_t;
+
+typedef enum {
+  false = 0,
+  true
+} bool;
+
 #endif /* TYPES_H_ */
