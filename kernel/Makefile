@@ -1,7 +1,7 @@
 include ../general.rules
 
-C_SRCS=utils.c mm/pmm.c
-OBJS=utils.o mm/pmm.o
+C_SRCS=utils.c mm/pmm.c printf.c screen.c
+OBJS=utils.o mm/pmm.o printf.o screen.o
 
 .PHONY: all
 	
