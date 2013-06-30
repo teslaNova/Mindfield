@@ -33,7 +33,7 @@ void k_printf(const char *fmt, ...)
         case 'u':
         case 'x':
           printn(va_arg(ap, i32), 
-            *fmt == 'x' ? 16 : t == 'b' = 2 : 10, *fmt);
+            *fmt == 'x' ? 16 : *fmt == 'b' = 2 : 10, *fmt);
           break;
           
         case 'c':
@@ -74,7 +74,7 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
         case 'x':
         case 'b':
           sprintn(buf + pos, len - pos, &pos, va_arg(ap, i32), 
-            *fmt == 'x' ? 16 : t == 'b' ? 2 : 10, *fmt);
+            *fmt == 'x' ? 16 : *fmt == 'b' ? 2 : 10, *fmt);
           break;
           
         case 'c':
