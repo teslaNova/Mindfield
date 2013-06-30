@@ -20,4 +20,7 @@ typedef u32 vaddr_t;
 #define false 0
 #define bool _Bool
 
+#undef size_t
+#define size_t u32
+
 #endif /* TYPES_H_ */
