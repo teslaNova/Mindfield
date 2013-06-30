@@ -2,20 +2,20 @@
 #define ASSERT_H_
 
 #ifndef NDEBUG
+#include <types.h>
 
-#include <screen.h>
-#include <print.h>
+void assert_fail(const char*, const char*, u32, const char*)
+  __attribute__ ((__noreturn__));
 
-#define assert(expr)                                        \
-  if (!(expr)) {                                            \
-    k_puts("assertion failed: #expr", __FILE__, __LINE__);  \
-    panic();                                                \
-  }
+#undef assert
+#define assert(expr) \
+  ((expr) ? (void) 0 : assert_fail(""#expr"", __FILE__, __LINE__, __func__)) 
 
 #else
+/* NDEBUG */
 
-#define assert(expr)
+#define assert(expr) (void) 0
 
 #endif
-
+  
 #endif

@@ -6,8 +6,8 @@
 static const u16   video_wdh = 80 * 25 * 2;
 static u16 * const video_ptr = (u16 *) 0xB8000;
 
-u8 video_pos_x = 0;
-u8 video_pos_y = 0;
+static u8 video_pos_x = 0;
+static u8 video_pos_y = 0;
 
 void k_scrn_clear(void)
 {
