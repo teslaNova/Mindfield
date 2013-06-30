@@ -32,8 +32,9 @@ void k_printf(const char *fmt, ...)
         case 'd':
         case 'u':
         case 'x':
+        case 'b':
           printn(va_arg(ap, i32), 
-            *fmt == 'x' ? 16 : *fmt == 'b' = 2 : 10, *fmt);
+            *fmt == 'x' ? 16 : *fmt == 'b' ? 2 : 10, *fmt);
           break;
           
         case 'c':
