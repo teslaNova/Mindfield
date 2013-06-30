@@ -16,9 +16,8 @@ typedef long long int i64;
 typedef u32 paddr_t;
 typedef u32 vaddr_t;
 
-typedef enum {
-  false = 0,
-  true
-} bool;
+#define true 1
+#define false 0
+#define bool _Bool
 
 #endif /* TYPES_H_ */
