@@ -38,7 +38,7 @@ void k_printf(const char *fmt, ...)
           break;
           
         case 'c':
-          k_scrn_putc(va_arg(ap, char));
+          k_scrn_putc((char) va_arg(ap, int));
           break;
           
         case 'p':
@@ -79,7 +79,7 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
           break;
           
         case 'c':
-          *(buf + pos++) = va_arg(ap, char);
+          *(buf + pos++) = (char) va_arg(ap, int);
           break;
           
         case 'p':
@@ -102,7 +102,7 @@ static void printn(i32 num, u16 base, char t)
   char buf[256] = { 0 };
   u32 uu = 0; /* unused */
   
-  sprintn(buf, 255, &uu, num, base, u);
+  sprintn(buf, 255, &uu, num, base, t);
   k_scrn_puts(buf);
 }
 
@@ -128,11 +128,12 @@ static void sprintn(char *buf, u32 max, u32 *pos, i32 num, u16 base, char t)
     tmp[off++] = digits[val % base];
   }
   
-  if (neg) *buf++ = '-';  
+  if (neg) *buf++ = '-', ++*pos;  
   
   if (t == 'x' || t == 'b') {
     *buf++ = '0';
     *buf++ = t;
+    *pos += 2;
   }
   
   while (off > 0) {
