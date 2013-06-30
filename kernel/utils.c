@@ -52,7 +52,7 @@ void *memset(void *dest, u32 v, u32 n) {
 }
 
 void outb(u8 p, u8 d) {
-  __asm__ (
+  __asm__ volatile (
     "mov $0, %%dx;"
     "mov $1, %%si;"
     "outsb"
