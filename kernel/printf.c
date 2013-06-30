@@ -115,7 +115,7 @@ static void sprints(char *buf, u32 max, u32 *pos, char *str)
 static void sprintn(char *buf, u32 max, u32 *pos, i32 num, u16 base, char t)
 {    
   char tmp[max + 1];
-  bool neg = num < 0;
+  bool neg = t != 'u' && num < 0;
   
   u32 off = 0;
   u32 val = neg ? -num : num;
