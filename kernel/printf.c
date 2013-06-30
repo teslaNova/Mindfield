@@ -3,14 +3,15 @@
 #include <types.h>
 #include <varg.h>
 #include <utils.h>
+#include <assert.h>
 
-static const char digits[] = "1234567890abcdefghijklmnopqrstuvwyz";
+static const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /* numeric output */
-static void printn(i32, u16, bool);
+static void printn(i32, u16, char);
 
 /* numeric output with buffer-support */
-static void sprintn(char*, u32, u32*, i32, u16, bool);
+static void sprintn(char*, u32, u32*, i32, u16, char);
 
 /* copy string into buffer */
 static void sprints(char*, u32, u32*, char*);
@@ -31,10 +32,8 @@ void k_printf(const char *fmt, ...)
         case 'd':
         case 'u':
         case 'x':
-        case 'b':
           printn(va_arg(ap, i32), 
-            *fmt == 'x' ? 16 : *fmt == 'b' ? 2 : 10, 
-            *fmt == 'u' || *fmt == 'x' || *fmt == 'b');
+            *fmt == 'x' ? 16 : t == 'b' = 2 : 10, *fmt);
           break;
           
         case 'c':
@@ -75,8 +74,7 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
         case 'x':
         case 'b':
           sprintn(buf + pos, len - pos, &pos, va_arg(ap, i32), 
-            *fmt == 'x' ? 16 : *fmt == 'b' ? 2 : 10, 
-            *fmt == 'u' || *fmt == 'x' || *fmt == 'b');
+            *fmt == 'x' ? 16 : t == 'b' ? 2 : 10, *fmt);
           break;
           
         case 'c':
@@ -98,9 +96,45 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
 
 /* ----------------------------- */
 
+static void printn(i32 num, u16 base, char t)
+{
+  char buf[256] = { 0 };
+  u32 uu = 0; /* unused */
+  
+  sprintn(buf, 255, &uu, num, base, u);
+  k_scrn_puts(buf);
+}
+
 static void sprints(char *buf, u32 max, u32 *pos, char *str)
 {
   for (; *pos < max && *str; ++*pos) {
     *buf++ = *str++;
+  }
+}
+
+static void sprintn(char *buf, u32 max, u32 *pos, i32 num, u16 base, char t)
+{    
+  char tmp[max + 1];
+  bool neg = num < 0;
+  
+  u32 off = 0;
+  u32 val = neg ? -num : num;
+  
+  if (neg) max -= 1;
+  if (t == 'x' || t == 'b')  max -= 2;
+  
+  for (; val > 0 && off < max; val /= base) {
+    tmp[off++] = digits[val % base];
+  }
+  
+  if (neg) *buf++ = '-';  
+  
+  if (t == 'x' || t == 'b') {
+    *buf++ = '0';
+    *buf++ = t;
+  }
+  
+  while (off > 0) {
+    *buf++ = tmp[--off], ++*pos;
   }
 }
