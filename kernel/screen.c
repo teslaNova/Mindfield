@@ -9,7 +9,7 @@ static       u16 *video_ptr = (u16 *) 0xB80000;
 static u8 video_pos_x = 0;
 static u8 video_pos_y = 0;
 
-void k_scrn_cls(void)
+void k_scrn_clear(void)
 {
   for (u16 i = 0; i < video_wdh; ++i) {
     *(video + i) = 0;
