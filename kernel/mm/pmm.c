@@ -20,7 +20,7 @@ struct chunk {
 #define FIND_EMPTY_CHUNK(chunks, i) while(chunks[i].size != 0) { i++; }
 #define CALC_CHUNK_SIZE(chunk) chunk.size = chunk.end - chunk.start
 
-void test_chunk(struct chunk *chunks, u32 *i, u32 start, u32 end) {
+static void test_chunk(struct chunk *chunks, u32 *i, u32 start, u32 end) {
   u32 tmp = 0;
 
   if(chunks[*i].start < start && chunks[*i].end > start) {

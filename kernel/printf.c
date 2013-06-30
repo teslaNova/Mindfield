@@ -8,10 +8,10 @@
 static void printn(i32, u16, bool);
 
 /* numeric output with buffer-support */
-static void sprintn(char*, *u32, i32, u16, bool);
+static void sprintn(char*, u32*, i32, u16, bool);
 
 /* copy string into buffer */
-static void sprints(char*, *u32, char*);
+static void sprints(char*, u32*, char*);
 
 void k_printf(const char *fmt, ...)
 {
@@ -44,7 +44,7 @@ void k_printf(const char *fmt, ...)
           break;
       }
     } else {
-      k_scrn_putc(fmt);
+      k_scrn_putc(*fmt);
     }
   }
   

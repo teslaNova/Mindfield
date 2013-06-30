@@ -3,16 +3,16 @@
 
 #define TAB_WIDTH 4
 
-static const u16  video_wdh = 80 * 25 * 2;
-static       u16 *video_ptr = (u16 *) 0xB80000;
+const u16  video_wdh = 80 * 25 * 2;
+u16 * const video_ptr = (u16 *) 0xB80000;
 
-static u8 video_pos_x = 0;
-static u8 video_pos_y = 0;
+u8 video_pos_x = 0;
+u8 video_pos_y = 0;
 
 void k_scrn_clear(void)
 {
   for (u16 i = 0; i < video_wdh; ++i) {
-    *(video + i) = 0;
+    *(video_ptr + i) = 0;
   }  
   
   video_pos_x = 0;
