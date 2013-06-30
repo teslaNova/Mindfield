@@ -4,14 +4,16 @@
 #include <varg.h>
 #include <utils.h>
 
+static const char digits[] = "1234567890abcdefghijklmnopqrstuvwyz";
+
 /* numeric output */
 static void printn(i32, u16, bool);
 
 /* numeric output with buffer-support */
-static void sprintn(char*, u32*, i32, u16, bool);
+static void sprintn(char*, u32, u32*, i32, u16, bool);
 
 /* copy string into buffer */
-static void sprints(char*, u32*, char*);
+static void sprints(char*, u32, u32*, char*);
 
 void k_printf(const char *fmt, ...)
 {
@@ -53,16 +55,18 @@ void k_printf(const char *fmt, ...)
 
 u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
 {
-  u32 avl = len;
+  u32 pos = 0;
   
   va_list ap;
   va_start(ap, fmt);
   
-  for (; *fmt != 0 && avl != 0; ++fmt) {
+  assert(buf != NULL);
+  
+  for (; *fmt != 0 && pos < len; ++fmt) {
     if (*fmt == '%' && *(fmt + 1) != 0) {
       switch (*++fmt) {
         case 's':
-          sprints(buf, &avl, va_arg(ap, char*));
+          sprints(buf + pos, len - pos, &pos, va_arg(ap, char*));
           break;
         
         case 'i':
@@ -70,13 +74,13 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
         case 'u':
         case 'x':
         case 'b':
-          sprintn(buf, &avl, va_arg(ap, i32), 
+          sprintn(buf + pos, len - pos, &pos, va_arg(ap, i32), 
             *fmt == 'x' ? 16 : *fmt == 'b' ? 2 : 10, 
             *fmt == 'u' || *fmt == 'x' || *fmt == 'b');
           break;
           
         case 'c':
-          *buf++ = va_arg(ap, char), --avl;
+          *(buf + pos++) = va_arg(ap, char);
           break;
           
         case 'p':
@@ -84,12 +88,19 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
           break;
       }
     } else {
-      *buf++ = *fmt, --avl;
+      *(buf + pos++) = *fmt;
     }
   }
   
   va_end(ap);
-  return len - avl;
+  return pos;
 }
 
-/* todo: implement printn, sprintn & sprints */
+/* ----------------------------- */
+
+static void sprints(char *buf, u32 max, u32 *pos, char *str)
+{
+  for (; *pos < max && *str; ++*pos) {
+    *buf++ = *str++;
+  }
+}

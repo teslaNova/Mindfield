@@ -3,8 +3,8 @@
 
 #define TAB_WIDTH 4
 
-const u16  video_wdh = 80 * 25 * 2;
-u16 * const video_ptr = (u16 *) 0xB80000;
+static const u16   video_wdh = 80 * 25 * 2;
+static u16 * const video_ptr = (u16 *) 0xB80000;
 
 u8 video_pos_x = 0;
 u8 video_pos_y = 0;
