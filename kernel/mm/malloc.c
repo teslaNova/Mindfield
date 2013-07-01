@@ -4865,7 +4865,7 @@ void *sbrk(size_t amount) {
   }
   
   if(pages == 1) {
-    return pmm_pop();
+    return (void *)pmm_pop();
   }
   
   paddr_t history[32] = {0}, base=0;
@@ -4899,5 +4899,5 @@ void *sbrk(size_t amount) {
     }
   }
   
-  return base;
+  return (void *)base;
 }

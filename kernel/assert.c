@@ -12,6 +12,7 @@ void assert_fail(const char *expr,
     file, line, func, expr);
   
   panic();
+  for(;;);
 }
 
 #endif
