@@ -6,6 +6,11 @@
 
 #include <mm/pmm.h>
 
+void panic(void) {
+  __asm__ volatile ("hlt");
+  for(;;);
+}
+
 void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   k_cls();
   

@@ -3,6 +3,8 @@
 
 #ifndef NDEBUG
 
+extern void panic(void);
+
 void assert_fail(const char *expr, 
   const char *file, u32 line, const char *func)
 {
@@ -10,9 +12,6 @@ void assert_fail(const char *expr,
     file, line, func, expr);
   
   panic();
-  
-  /* no return */
-  for(;;) ;
 }
 
 #endif
