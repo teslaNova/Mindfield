@@ -1,7 +1,7 @@
 include ../general.rules
 
-C_SRCS=utils.c mm/pmm.c mm/malloc.c printf.c screen.c assert.c
-OBJS=utils.o mm/pmm.o mm/malloc.o printf.o screen.o assert.o
+C_SRCS=utils.c mm/pmm.c mm/malloc.c printf.c screen.c assert.c rtc.c
+OBJS=$(C_SRCS:%.c:%.o)
 
 .PHONY: all
 	
