@@ -2,6 +2,14 @@
 
 #include <utils.h>
 
+#ifndef RES_X
+#define RES_X 800
+#endif
+
+#ifndef RES_Y
+#define RES_Y 600
+#endif
+
 #define BGA_P_REGSEL 0x01CE
 #define BGA_P_REGDAT 0x01CF
 
@@ -29,6 +37,12 @@ enum bga_register {
   BGAR_YOFF,
 };
 
+enum {
+  BGA_EF_DISABLE = 0,
+  BGA_EF_ENABLE = 1,
+  BGA_EF_NOT_CLEAR = 0x80
+};
+
 static u16 bga_read(enum bga_register reg) {
   outw(BGA_P_REGSEL, reg);
   return inw(BGA_P_REGDAT);
@@ -40,7 +54,7 @@ static void bga_write(enum bga_register reg, u16 data) {
 }
 
 static void bga_set_state(bool enable) {
-  bga_write(BGAR_ENABLE, enable);
+  bga_write(BGAR_ENABLE, enable | BGA_EF_NOT_CLEAR);
 }
 
 bool bga_is_present(void) {
@@ -52,6 +66,21 @@ bool bga_is_present(void) {
     case 0xB0C4:
     case 0xB0C5: break;
     default: return false;
+  }
+  
+  return true;
+}
+
+bool bga_init(void) {
+  u8 bpp = bga_get_bpp_caps();
+  bpp = (bpp & 32 ? 32 : bpp & 24 ? 24 : bpp & 16 ? 16 : bpp & 15 ? 15 : bpp & 8 ? 8 : 4);
+
+  if(bga_set_bpp(bpp) == false) {
+    return false;
+  }
+  
+  if(bga_set_resolution(RES_X, RES_Y) == false) {
+    return false;
   }
   
   return true;
@@ -71,11 +100,11 @@ bool bga_set_resolution(u16 x, u16 y) {
 }
 
 u16 bga_get_x_resolution(void) {
-  
+  return bga_read(BGAR_XRES);
 }
 
 u16 bga_get_y_resolution(void) {
-  
+  return bga_read(BGAR_YRES);
 }
 
 bool bga_set_bpp(u8 bpp) {
@@ -116,4 +145,37 @@ u8 bga_get_bpp_caps(void) {
   }
   
   return 0;
+}
+
+void bga_set_x_offset(u16 x) {
+  bga_write(BGAR_XOFF, x);
+}
+
+u16 bga_get_x_offset(void) {
+  bga_read(BGAR_XOFF);
+}
+
+void bga_set_y_offset(u16 y) {
+  bga_write(BGAR_YOFF, y);
+}
+
+u16 bga_get_y_offset(void) {
+  bga_read(BGAR_YOFF);
+}
+
+void bga_set_bank(u16 bank) {
+  bga_write(BGAR_BANK, bank);
+}
+
+// screen compability
+static u32 *bga_video_ptr = 0xA0000;
+
+void bga_clear(void) {
+  bga_write(BGAR_ENABLE, BGA_EF_DISABLE);
+  bga_write(BGAR_ENABLE, BGA_EF_ENABLE);
+}
+
+//void bga_font_set(u8 *data);
+void bga_font_putc(char c) { 
+  
 }
