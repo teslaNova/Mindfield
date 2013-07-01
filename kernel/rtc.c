@@ -13,7 +13,7 @@
 	u16 century;
 } rtc_datetime_t; */
 
-enum {
+enum rtc_register {
   RTCR_SEC = 0,
   RTCR_MIN = 2,
   RTCR_HOURS = 4,
@@ -29,12 +29,12 @@ enum {
 #define CMOS_P_REGSEL 0x70
 #define CMOS_P_REGDAT 0x71
 
-static u8 inline cmos_read(u8 reg) {
+static u8 inline cmos_read(enum rtc_register reg) {
   outb(CMOS_P_REGSEL, 0x80 | reg);
   return inb(CMOS_P_REGDAT);
 }
 
-static void inline cmos_write(u8 reg, u8 data) {
+static void inline cmos_write(enum rtc_register reg, u8 data) {
   outb(CMOS_P_REGSEL, 0x80 | reg);
   outb(CMOS_P_REGDAT, data);
 }
