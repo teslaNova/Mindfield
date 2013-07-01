@@ -11,14 +11,19 @@
 
 #include <utils.h>
 
+#include <video/bga.h>
+
 void panic(void) {
+  k_printf("panic() called. halting.");
+  
   __asm__ volatile ("hlt");
   for(;;);
 }
 
 void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
-  k_cls();
-  k_printf("Mindfield\n");
+  k_scrn_init();
+  
+  k_printf("Mindfield\n\n");
   
   if(mb_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
     k_printf("System Halted.\n");
@@ -30,7 +35,7 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   
   for(rtc_datetime_t dt={.year=-1};;rtc_get_datetime(&dt)) {
     if(dt.year != (u16)-1) {
-      k_printf("It is %d.%d.%d %d:%d:%d.\r", dt.day, dt.month, dt.year, dt.hours, dt.minutes, dt.seconds);
+      k_printf("It is %d.%d.%d %d:%d:%d.\n", dt.day, dt.month, dt.year, dt.hours, dt.minutes, dt.seconds);
     }
     rtc_sleep(1);
   }
