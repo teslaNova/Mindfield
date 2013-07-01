@@ -1,6 +1,8 @@
 #include <screen.h>
 #include <types.h>
 
+#include <video/bga.h>
+
 #define TAB_WIDTH 4
 
 static u16              video_wdh = 80 * 25 * 2;
@@ -11,6 +13,14 @@ static u8 video_pos_y = 0;
 
 void k_scrn_init(void) {
   k_scrn_clear();
+  
+  if(bga_is_present() == true) {
+    u8 bpp = bga_get_bpp_caps();
+    bpp = (bpp & 32 ? 32 : bpp & 24 ? 24 : bpp & 16 ? 16 : bpp & 15 ? 15 : bpp & 8 ? 8 : 4);
+    
+    bga_set_bpp(bpp);
+    bga_set_resolution(RES_X, RES_Y);
+  }
 }
 
 void k_scrn_clear(void)
