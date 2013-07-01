@@ -51,47 +51,38 @@ void *memset(void *dest, u32 v, u32 n) {
   return dest;
 }
 
-void outb(u8 p, u8 d) {
+void outb(u16 p, u8 d) {
   __asm__ volatile (
-    "mov $0, %%dx;"
-    "mov $1, %%si;"
-    "outsb"
-      :: "g"(p), "g"(d)
+    "outb %%al, %%dx"
+      :: "a"(d), "d"(p)
   );
 }
 
-u8 inb(u8 p) {
+u8 inb(u16 p) {
   u8 d=0;
   
   __asm__ volatile (
-    "mov $1, %%dx;"
-    "mov $0, %%di;"
-    "insb"
-      : "=g"(d) : "g"(p) 
-   );
+    "inb %%dx, %%al"
+      : "=a"(d) : "d"(p)
+  );
   
   return d;
 }
 
-void outw(u8 p, u16 d) {
+void outw(u16 p, u16 d) {
   __asm__ volatile (
-    "mov $0, %%dx;"
-    "mov $1, %%si;"
-    "outsw"
-      :: "g"(p), "g"(d)
+    "outw %%ax, %%dx"
+      :: "a"(d), "d"(p)
   );
 }
 
-u16 inw(u8 p) {
+u16 inw(u16 p) {
   u16 d=0;
   
   __asm__ volatile (
-    "mov $1, %%dx;"
-    "mov $0, %%di;"
-    "insw"
-      : "=g"(d) : "g"(p) 
-   );
- 
+    "inw %%dx, %%ax"
+      : "=a"(d) : "d"(p)
+  );
   
   return d;
 }
