@@ -17,4 +17,7 @@ u8 inb(u16 p);
 void outw(u16 p, u16 d);
 u16 inw(u16 p);
 
+void outl(u16 p, u32 d);
+u32 inl(u16 p);
+
 #endif /* UTILS_H_ */

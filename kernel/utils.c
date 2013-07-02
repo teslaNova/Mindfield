@@ -86,3 +86,21 @@ u16 inw(u16 p) {
   
   return d;
 }
+
+void outl(u16 p, u32 d) {
+  __asm__ volatile (
+    "outl %%eax, %%dx"
+      :: "a"(d), "d"(p)
+  );
+}
+
+u32 inl(u16 p) {
+  u32 d=0;
+  
+  __asm__ volatile (
+    "inl %%dx, %%eax"
+      : "=a"(d) : "d"(p)
+  );
+  
+  return d;
+}
