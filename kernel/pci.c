@@ -23,23 +23,6 @@ static u16 pci_config_read(u8 bus, u8 dev, u8 func, u8 reg) {
   const u16 CONFIG_ADDRESS = 0xCF8;
   const u16 CONFIG_DATA = 0xCFC;
   
-  struct {
-    u8 null : 2;
-    u8 reg_num : 6;
-    u8 func_num : 3;
-    u8 dev_num : 5;
-    u8 bus_num : 8;
-    u8 _res0 : 7;
-    u8 enable : 1;
-  } addr = {
-    .null = 0,
-    .bus_num = bus,
-    .dev_num = dev,
-    .func_num = func,
-    .reg_num = reg & 0xFC,
-    .enable = 1,
-  };
-  
   outl(CONFIG_ADDRESS, (0x80000000 | (bus << 16) | (dev << 11) | (func << 8) | (reg & 0xFC)));
   return inl(CONFIG_DATA) >> ((reg & 2) * 8) & 0xFFFF;
 } 
@@ -76,11 +59,11 @@ static void pci_check_device(u8 bus, u8 dev, u8 func) {
   pci_dev_table[pci_dev_it].header.type.raw = tmp & 0x0FF;
   pci_dev_table[pci_dev_it].header.bist.raw = tmp >> 8;
   
-  k_printf("#%d -> %x:%x type: %x (bus: %x, dev: %x, func: %x, mf: %s)\n", 
+/*  k_printf("#%d -> %x:%x type: %x (bus: %x, dev: %x, func: %x, mf: %s)\n", 
     pci_dev_it + 1,
     pci_dev_table[pci_dev_it].header.vendor_id, pci_dev_table[pci_dev_it].header.device_id, tmp & ~0xFF80,
     bus, dev, func,
-    pci_dev_table[pci_dev_it - 1].header.type.data.mf == 1 ? "yes" : "no");
+    pci_dev_table[pci_dev_it - 1].header.type.data.mf == 1 ? "yes" : "no");*/
     
     switch(pci_dev_table[pci_dev_it].header.type.data.id) {
       case 0: pci_check_device_type0(bus, dev, func); break;
