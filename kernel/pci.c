@@ -144,4 +144,6 @@ const pci_entry_t* pci_get_device(u32 vendor, u32 device) {
       return (const pci_entry_t *)&pci_dev_table[i];
     }
   }
+  
+  return NULL;
 }
