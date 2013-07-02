@@ -53,7 +53,7 @@ static u32 bga_video_pos_x = 0;
 static u32 bga_video_pos_y = 0;
 static u32 bga_font_px = 10;
 
-extern const u8 *bga_default_font_bitmap;
+extern u8 bga_default_font_bitmap[];
 extern const u8 bga_default_font_size_x;
 extern const u8 bga_default_font_size_y;
 
@@ -203,14 +203,16 @@ void bga_font_putc(char c) {
   bga_video_pos_x = RES_X / 2;
   bga_video_pos_y = RES_X * 5;
   
-  for(u32 j=0; j<bga_default_font_size_y; j++) {
-    for(u32 k=0; k<bga_default_font_size_x; k++) {
-      for(u32 pt=0; pt<4; pt++) {
-        u32 off = (pt + (k * bga_default_font_size_x) + bga_video_pos_x) + (RES_X * j + bga_video_pos_y);
+  for(u32 n=0; n<3; n++) {
+    for(u32 j=0; j<bga_default_font_size_y; j++) {
+      for(u32 k=0; k<bga_default_font_size_x; k++) {
+          u32 off = ((bga_default_font_size_x - k) + bga_video_pos_x) + (RES_X * j + bga_video_pos_y);
       
-        bga_video_ptr[off] = (bga_default_font_bitmap[i + j] & (1 << k) ? 0xFFFFFFFF : 0);
+          bga_video_ptr[off] = (bga_default_font_bitmap[i + j + (n * 16)] & (1 << k) ? 0xFFFFFFFF : 0);
       }
     }
+    
+    bga_video_pos_x += bga_default_font_size_x * 8 + 1;
   }
   
   for(;;);
