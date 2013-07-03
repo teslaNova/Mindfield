@@ -3,6 +3,9 @@
 
 #include <types.h>
 
+// currently only usable as text mode driver because of incompability of screen "driver"
+// -> HAL only (which should only run at ring3)
+
 bool bga_is_present(void);
 
 bool bga_init(void);
@@ -25,8 +28,11 @@ void bga_set_bank(u16 bank);
 
 // screen compability
 void bga_clear(void);
+void bga_draw(u32 x, u32 y, u32 rgb);
 
-//void bga_font_set(u8 *data);
-void bga_font_putc(char c);
+void bga_putc(char c);
+
+//void bga_font_set_ctx(font_t *)
+void bga_font_set_color(u32 rgb_fg, u32 rgb_bg);
 
 #endif /* VIDEO_BGA_H_ */

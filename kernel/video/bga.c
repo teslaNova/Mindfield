@@ -1,14 +1,18 @@
 #include <video/bga.h>
 
+#include <screen.h>
+
 #include <pci.h>
 #include <utils.h>
 
+#include <font.h>
+
 #ifndef RES_X
-#define RES_X 640
+#define RES_X 800
 #endif
 
 #ifndef RES_Y
-#define RES_Y 480
+#define RES_Y 600
 #endif
 
 #define BGA_VENDOR 0x1234
@@ -51,13 +55,13 @@ static u8 bga_capabilities = 0;
 static u32 *bga_video_ptr = (u32 *) 0xA0000;
 static u32 bga_video_pos_x = 0;
 static u32 bga_video_pos_y = 0;
-static u32 bga_font_px = 10;
+static u32 bga_video_res_x = RES_X;
+static u32 bga_video_res_y = RES_Y;
 
-extern u8 bga_default_font_bitmap[];
-extern const u8 bga_default_font_size_x;
-extern const u8 bga_default_font_size_y;
+static u32 bga_font_color_fg = 0xFFFFFFFF;
+static u32 bga_font_color_bg = 0;
 
-static void bga_draw_32bpp(u32 x, u32 y, u32 c);
+extern const font_t font;
 
 static u16 bga_read(enum bga_register reg) {
   outw(BGA_P_REGSEL, reg);
@@ -88,17 +92,36 @@ bool bga_is_present(void) {
 }
 
 bool bga_init(void) {
+  if(!bga_capabilities & (BGAC_32BPP | BGAC_FRM_BUFFER)) {
+    return false;
+  }
+  
+  // setup bit depth
   u8 bpp = bga_get_bpp_caps();
-  bpp = (bpp & 32 ? 32 : bpp & 24 ? 24 : bpp & 16 ? 16 : bpp & 15 ? 15 : bpp & 8 ? 8 : 4);
+  bpp = (bpp & 32 ? 32 : 24);
 
   if(bga_set_bpp(bpp) == false) {
     return false;
   }
+
+  // setup res
+  const struct {u16 w; u16 h;} res_tbl[] = {{800, 600}, {640, 480}};
+  u32 res_tbl_it;
   
-  if(bga_set_resolution(RES_X, RES_Y) == false) {
+  for(res_tbl_it=sizeof(res_tbl) / sizeof(res_tbl[0]); res_tbl_it>0; res_tbl_it--) {
+    if(bga_set_resolution(res_tbl[res_tbl_it].w, res_tbl[res_tbl_it].h) == true) {
+      break;
+    }
+  }
+  
+  if(res_tbl_it == 0) {
     return false;
   }
   
+  bga_video_res_x = res_tbl[res_tbl_it].w;
+  bga_video_res_y = res_tbl[res_tbl_it].h;
+  
+  // get lfb addr
   const pci_entry_t *bga_dev = pci_get_device(BGA_VENDOR, BGA_DEVICE);
 
   if(bga_dev != NULL) { // LINEAR FRAMEBUFFER TAKE ME!
@@ -196,28 +219,62 @@ void bga_clear(void) {
   bga_write(BGAR_ENABLE, BGA_EF_ENABLE | BGA_EF_LFR);
 }
 
-//void bga_font_set(u8 *data);
-void bga_font_putc(char c) { 
-  u32 i = 0;//c - 0x30;
-  
-  bga_video_pos_x = RES_X / 2;
-  bga_video_pos_y = RES_X * 5;
-  
-  for(u32 n=0; n<3; n++) {
-    for(u32 j=0; j<bga_default_font_size_y; j++) {
-      for(u32 k=0; k<bga_default_font_size_x; k++) {
-          u32 off = ((bga_default_font_size_x - k) + bga_video_pos_x) + (RES_X * j + bga_video_pos_y);
-      
-          bga_video_ptr[off] = (bga_default_font_bitmap[i + j + (n * 16)] & (1 << k) ? 0xFFFFFFFF : 0);
-      }
-    }
-    
-    bga_video_pos_x += bga_default_font_size_x * 8 + 1;
-  }
-  
-  for(;;);
+void inline bga_draw(u32 x, u32 y, u32 rgb) {
+  bga_video_ptr[x + y] = rgb;
 }
 
-static void bga_draw_32bpp(u32 x, u32 y, u32 c) {
+void bga_putc(char c) { 
+  u16 fi = 0;
+  
+  switch(c) {
+    case '\n': {
+      bga_video_pos_y += bga_video_res_x * font.height;
+    };
+    
+    case '\r': {
+      bga_video_pos_x = 0;
+    } return;
+    
+    case '\t': {
+      bga_video_pos_x += TAB_WIDTH;
+    } return;
+    
+    default: {
+      for(fi=0;fi<font.char_count;fi++) { // locate char
+        if(font.indices[fi] == c) break;
+      }
+  
+      if(fi == font.char_count) {
+        return;
+      }
+      
+      fi *= font.height;
+    }
+  }
+  
+  if(bga_video_pos_x >= bga_video_res_x) {
+    bga_video_pos_x = 0;
+    bga_video_pos_y += bga_video_res_x * font.height;
+  }
+  
+  for(u32 j=0; j<font.height; j++) {
+    for(u32 k=0; k<font.width; k++) {
+      if(font.bitmap[fi + j] & (1 << k)) {
+        bga_draw((font.width - k) + bga_video_pos_x, bga_video_res_x * j + bga_video_pos_y, bga_font_color_fg);
+      } else {
+        bga_draw((font.width - k) + bga_video_pos_x, bga_video_res_x * j + bga_video_pos_y, bga_font_color_bg);
+      }
+    }
+  }
+    
+  bga_video_pos_x += font.width;
+}
+
+void bga_font_set_color(u32 rgb_fg, u32 rgb_bg) {
+  bga_font_color_fg = rgb_fg;
+  bga_font_color_bg = rgb_bg;
+}
+
+void bga_render(void) {
   
 }
