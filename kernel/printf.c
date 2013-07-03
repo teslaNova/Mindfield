@@ -181,7 +181,7 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
         ++fmt;
       }
       
-      printf("%%%% wdh: %u\n", width);
+      PF_DEBUG_OP("%%%% wdh: %u\n", width)
          
       switch (*fmt) {
         default: /* invalid format */
@@ -319,7 +319,7 @@ static void padd(char *buf, u32 cap, u32 *off,
     PF_DEBUG_OP("%%%% out: '%c'\n", pchr)
     
     if (buf == NULL) {
-      putchar(pchr);
+      k_scrn_putc(pchr);
     } else {
       *(buf + *off) = pchr;
     }
