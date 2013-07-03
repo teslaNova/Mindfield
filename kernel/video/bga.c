@@ -274,7 +274,3 @@ void bga_font_set_color(u32 rgb_fg, u32 rgb_bg) {
   bga_font_color_fg = rgb_fg;
   bga_font_color_bg = rgb_bg;
 }
-
-void bga_render(void) {
-  
-}

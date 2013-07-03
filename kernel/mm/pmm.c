@@ -114,3 +114,7 @@ void pmm_push(paddr_t page) {
   *++stack_top = page;
   stack_size++;
 }
+
+u32 pmm_size(void) {
+  return stack_size;
+}

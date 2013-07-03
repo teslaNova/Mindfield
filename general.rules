@@ -8,7 +8,7 @@ SH=`which sh`
 RM=`which rm`
 CP=`which cp`
 
-CFLAGS=-nostdinc -nostdlib -O0 -I ../include -I ./include -c -fno-stack-protector -fno-builtin -fleading-underscore -masm=intel
+CFLAGS=-nostdinc -nostdlib -O0 -I ../include -I ./include -c -fno-stack-protector -fleading-underscore -std=c99
 LDFLAGS=-T kernel.ld -L/usr/local/lib
 ASFLAGS=-f elf
 

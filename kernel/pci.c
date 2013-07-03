@@ -130,3 +130,7 @@ const pci_entry_t* pci_get_device(u32 vendor, u32 device) {
   
   return NULL;
 }
+
+u32 pci_count(void) {
+  return pci_dev_it;
+}

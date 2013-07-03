@@ -217,6 +217,9 @@ typedef struct {
 } pci_entry_t;
 
 void pci_scan(void);
+
 const pci_entry_t* pci_get_device(u32 vendor, u32 device);
+
+u32 pci_count(void);
 
 #endif /* PCI_H_ */
