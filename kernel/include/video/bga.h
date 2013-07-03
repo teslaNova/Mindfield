@@ -3,6 +3,9 @@
 
 #include <types.h>
 
+// currently only usable as text mode driver because of incompability of screen "driver"
+// -> HAL only (which should only run at ring3)
+
 bool bga_is_present(void);
 
 bool bga_init(void);
