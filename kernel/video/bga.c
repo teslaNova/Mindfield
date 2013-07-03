@@ -92,9 +92,13 @@ bool bga_is_present(void) {
 }
 
 bool bga_init(void) {
+  if(!bga_capabilities & (BGAC_32BPP | BGAC_FRM_BUFFER)) {
+    return false;
+  }
+  
   // setup bit depth
   u8 bpp = bga_get_bpp_caps();
-  bpp = (bpp & 32 ? 32 : bpp & 24 ? 24 : bpp & 16 ? 16 : bpp & 15 ? 15 : bpp & 8 ? 8 : 4);
+  bpp = (bpp & 32 ? 32 : 24);
 
   if(bga_set_bpp(bpp) == false) {
     return false;
@@ -269,4 +273,8 @@ void bga_putc(char c) {
 void bga_font_set_color(u32 rgb_fg, u32 rgb_bg) {
   bga_font_color_fg = rgb_fg;
   bga_font_color_bg = rgb_bg;
+}
+
+void bga_render(void) {
+  
 }
