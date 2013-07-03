@@ -106,11 +106,6 @@ static void snprint_w(char*, u32, u32*, pf_flags_t, pf_width_t, i32);
 static void padd(char*, u32, u32*, pf_flags_t, pf_width_t);
 static void outp(char*, u32, u32*, pf_flags_t, pf_width_t, char*, u32);
 
-u32 inline k_printf(const char *fmt, ...)
-{
-  return k_snprintf(NULL, 0, fmt);
-}
-
 u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
 {
   u32 off;
