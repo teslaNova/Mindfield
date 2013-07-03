@@ -2,16 +2,11 @@
 #include <types.h> // iN, uN
 
 #include <screen.h>
-#include <video/bga.h>
-
 #include <printf.h>
 
 #include <mm/pmm.h>
-#include <mm/malloc.h>
 
 #include <rtc.h>
-
-#include <utils.h>
 
 #include <pci.h>
 
@@ -27,7 +22,11 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   
   k_scrn_init();
   
-  k_printf("Mindfield\n");
+  k_printf("Mindfield\n\n");
+  
+  k_printf("Gathering System Information..\n");
+  k_printf("Found %d PCI Devices\n\n", pci_count());
+  /* cpu "scan" */
   
   if(mb_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
     k_printf("System Halted.\n");
@@ -38,7 +37,7 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   pmm_setup(mb_info->mmap_addr, mb_info->mmap_length);
   
   for(rtc_datetime_t dt={0};;rtc_get_datetime(&dt)) {
-    k_printf("\rIt is %d.%d.%d %d:%d:%d", dt.day, dt.month, dt.year, dt.hours, dt.minutes, dt.seconds);
+    k_printf("\rIt is %2d.%2d.%4d %2d:%2d:%2d", dt.day, dt.month, dt.year, dt.hours, dt.minutes, dt.seconds);
     rtc_sleep(1);
   }
 }
