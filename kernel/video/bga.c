@@ -228,6 +228,8 @@ void bga_putc(char c) {
       if(fi == font.char_count) {
         return;
       }
+      
+      fi *= font.height;
     }
   }
   
@@ -238,7 +240,7 @@ void bga_putc(char c) {
   
   for(u32 j=0; j<font.height; j++) {
     for(u32 k=0; k<font.width; k++) {
-      if(font.bitmap[fi * font.height + j] & (1 << k)) {
+      if(font.bitmap[fi + j] & (1 << k)) {
         bga_draw((font.width - k) + bga_video_pos_x, bga_video_res_x * j + bga_video_pos_y, bga_font_color_fg);
       } else {
         bga_draw((font.width - k) + bga_video_pos_x, bga_video_res_x * j + bga_video_pos_y, bga_font_color_bg);
@@ -247,4 +249,9 @@ void bga_putc(char c) {
   }
     
   bga_video_pos_x += font.width + 1;
+}
+
+void bga_font_set_color(u32 rgb_fg, u32 rgb_bg) {
+  bga_font_color_fg = rgb_fg;
+  bga_font_color_bg = rgb_bg;
 }

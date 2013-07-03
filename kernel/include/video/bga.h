@@ -29,4 +29,7 @@ void bga_draw(u32 x, u32 y, u32 rgb);
 
 void bga_putc(char c);
 
+//void bga_font_set_ctx(font_t *)
+void bga_font_set_color(u32 rgb_fg, u32 rgb_bg);
+
 #endif /* VIDEO_BGA_H_ */
