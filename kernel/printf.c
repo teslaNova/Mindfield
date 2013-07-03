@@ -1,6 +1,6 @@
 #include <printf.h>
 #include <screen.h>
-#include <types.h>
+#include <varg.h>
 
 /* printf implementation */
 /* the syntax is (almost) the same as in stdio.h printf() [without support for float/double] */
@@ -101,6 +101,11 @@ static void snprint_w(char*, u32, u32*, pf_flags_t, pf_width_t, i32);
 /* helper functions */
 static void padd(char*, u32, u32*, pf_flags_t, pf_width_t);
 static void outp(char*, u32, u32*, pf_flags_t, pf_width_t, char*, u32);
+
+u32 inline k_printf(const char *fmt, ...)
+{
+  return k_snprintf(NULL, 0, fmt);
+}
 
 u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
 {
@@ -283,7 +288,7 @@ static void outp(char *buf, u32 cap, u32 *off,
     PF_DEBUG_OP("%%%% out: '%c'\n", *str)
     
     if (buf == NULL) {
-      putchar(*str);
+      k_scrn_putc(*str);
     } else {
       *(buf + *off) = *str;
     }
