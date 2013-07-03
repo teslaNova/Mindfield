@@ -1,6 +1,7 @@
 #include <printf.h>
 #include <screen.h>
 #include <types.h>
+#include <varg.h>
 
 /* printf implementation */
 /* the syntax is (almost) the same as in stdio.h printf() [without support for float/double] */
@@ -50,6 +51,9 @@
    NUMBER --> the given number (unsigned 32bit number [base 10]) is used as width
    '*'    --> the argument (unsigned 32bit number) preceding the argument that has to be formatted is used as width
 */ 
+   
+/* output function */
+#define PF_PUTCHAR(c) k_scrn_putc(c)
 
 typedef u16 pf_flags_t; /* space for 8 flags and one char (used for custom padding) */
 typedef u32 pf_width_t;
@@ -283,7 +287,7 @@ static void outp(char *buf, u32 cap, u32 *off,
     PF_DEBUG_OP("%%%% out: '%c'\n", *str)
     
     if (buf == NULL) {
-      putchar(*str);
+      PF_PUTCHAR(*str);
     } else {
       *(buf + *off) = *str;
     }
@@ -319,7 +323,7 @@ static void padd(char *buf, u32 cap, u32 *off,
     PF_DEBUG_OP("%%%% out: '%c'\n", pchr)
     
     if (buf == NULL) {
-      k_scrn_putc(pchr);
+      PF_PUTCHAR(pchr);
     } else {
       *(buf + *off) = pchr;
     }
