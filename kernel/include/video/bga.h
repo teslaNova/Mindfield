@@ -25,8 +25,8 @@ void bga_set_bank(u16 bank);
 
 // screen compability
 void bga_clear(void);
+void bga_draw(u32 x, u32 y, u32 rgb);
 
-//void bga_font_set(u8 *data);
-void bga_font_putc(char c);
+void bga_putc(char c);
 
 #endif /* VIDEO_BGA_H_ */
