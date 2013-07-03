@@ -263,7 +263,7 @@ void bga_putc(char c) {
     }
   }
     
-  bga_video_pos_x += font.width + 1;
+  bga_video_pos_x += font.width;
 }
 
 void bga_font_set_color(u32 rgb_fg, u32 rgb_bg) {
