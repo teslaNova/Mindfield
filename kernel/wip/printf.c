@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #define i8 signed char
 #define u8 unsigned char
@@ -38,12 +39,21 @@
 */
    
 /* flags: 
-   '-' --> left-padding (default is right)
-   '+' --> always print sign
-   ' ' --> insert blank space if no sign is going to be written 
-   '#' --> use prefix for numbers (0x for hex, 0b for binary or 0 for octal)
-   '0' --> use 0 as padding instead of a blank space
-   '=' --> use a custom padding (the next char defines the padding-char)
+   "-" --> right-padding (default is left)
+   "+" --> always print sign
+   " " --> insert blank space if no sign is going to be written 
+   "#" --> use prefix for numbers (0x for hex, 0b for binary or 0 for octal)
+        --> printf("%#x", 255)    => "0xff"
+        --> printf("%#-04x", 255) => "0xff00"
+        --> printf("%#04x", 255)  => "0x00ff"
+   "^" --> prefix affects width
+        --> printf("%#^04x", 255) => "0xff"
+        --> printf("%#^06x", 255) => "0x00ff"
+   "0" --> use 0 as padding instead of a blank space
+   "'" --> use a custom padding (the next char defines the padding-char)
+        --> printf("%-'.20s", "hello") => "hello..............."
+        --> printf("%-'-20s", "hello") => "hello---------------"
+        --> printf("%'_20s", "hello")  => "_______________hello"
 */
    
 /* width:
@@ -65,6 +75,7 @@ typedef u32 pf_width_t;
 #define FLAG_NSGN 0b0000000000001000
 #define FLAG_PNUL 0b0000000000010000
 #define FLAG_PCUS 0b0000000000100000
+#define FLAG_PWDH 0b0000000001000000
 
 /* handle "l" and "lu" format-types */
 #define PF_HANDLE_LONG 0
@@ -129,9 +140,10 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
           case ' ': flags |= FLAG_NSGN; break;
           case '#': flags |= FLAG_BPRX; break;
           case '0': flags |= FLAG_PNUL; break;
+          case '^': flags |= FLAG_PWDH; break;
           
           /* custom padding */
-          case '=': 
+          case '\'': 
             if (*(fmt + 1) == 0) {
               acc = false;
               break;
@@ -223,7 +235,7 @@ u32 k_snprintf(char *buf, u32 len, const char *fmt, ...)
           break;
         }
 #endif
-/* if PF_HANDLE LONG == 1 */
+/* if PF_HANDLE_LONG == 1 */
         
       }
     } else {
@@ -244,9 +256,11 @@ static void outp(char *buf, u32 cap, u32 *off,
   
   if (paddw > 0 && len < paddw) {
     paddw -= len;
+  } else {
+    paddw = 0;
   }
   
-  if (paddw && (flags & FLAG_LJUS)) {
+  if (paddw && !(flags & FLAG_LJUS)) {
     padd(buf, cap, off, flags, paddw);
     paddw = 0;
   }
@@ -313,9 +327,10 @@ static void snprint_d(char *buf, u32 cap, u32 *off,
 {
   /* 32 bits + null-byte */
   char tmp[33] = { 0 };
-  char *ptr = tmp + 33;
+  char *ptr = tmp + 32;
   u32 base = 10;
   u32 doff = 0;
+  u32 abs;
   
   if (type == 'x' || type == 'X') {
     base = 16;
@@ -330,23 +345,28 @@ static void snprint_d(char *buf, u32 cap, u32 *off,
   }
   
   if (num < 0 && type != 'u' && type != 'x' && type != 'X' && type != 'b') {
-    num = -num;
+    abs = -num;
     
     /* print sign */
     snprint_c(buf, cap, off, 0, 0, '-');
     if (width > 0) --width;
     
-    do {
-      *--ptr = digits[num % base];
-      num /= base;
-    } while (num);
-    
     if ((flags & FLAG_BPRX) && type == 'o') {
       /* print prefix */
       snprint_c(buf, cap, off, 0, 0, '0');
-      if (width > 0) --width;
+      
+      if ((flags & FLAG_PWDH) && width > 0) {
+        --width;
+      }
     }
+    
+    do {
+      *--ptr = digits[abs % base];
+      abs /= base;
+    } while (abs);
   } else {
+    abs = num;
+    
     if (type == 'd' || type == 'i' || type == 'o') {
       if (flags & FLAG_ASGN) {
         /* print sign */
@@ -359,24 +379,30 @@ static void snprint_d(char *buf, u32 cap, u32 *off,
       }
     }
     
-    do {
-      *--ptr = digits[num % base + doff];
-      num /= base;
-    } while (num);
-    
     if (flags & FLAG_BPRX) {
       if (type == 'X' || type == 'x' || type == 'o') {
         /* print '0' as first part of the prefix */
         snprint_c(buf, cap, off, 0, 0, '0');
-        if (width > 0) --width;
+        
+        if ((flags & FLAG_PWDH) && width > 0) {
+          --width;
+        }
       }
       
       if (type == 'X' || type == 'x' || type == 'b') {
         /* print 'x' or 'X' or 'b' as second part of the prefix */
         snprint_c(buf, cap, off, 0, 0, type);
-        if (width > 0) --width;
+        
+        if ((flags & FLAG_PWDH) && width > 0) {
+          --width;
+        }
       } 
     }
+    
+    do {
+      *--ptr = digits[abs % base + doff];
+      abs /= base;
+    } while (abs);
   }
   
   /* print computed string */
