@@ -92,17 +92,32 @@ bool bga_is_present(void) {
 }
 
 bool bga_init(void) {
+  // setup bit depth
   u8 bpp = bga_get_bpp_caps();
   bpp = (bpp & 32 ? 32 : bpp & 24 ? 24 : bpp & 16 ? 16 : bpp & 15 ? 15 : bpp & 8 ? 8 : 4);
 
   if(bga_set_bpp(bpp) == false) {
     return false;
   }
+
+  // setup res
+  const struct {u16 w; u16 h;} res_tbl[] = {{800, 600}, {640, 480}};
+  u32 res_tbl_it;
   
-  if(bga_set_resolution(bga_video_res_x, bga_video_res_y) == false) {
+  for(res_tbl_it=sizeof(res_tbl) / sizeof(res_tbl[0]); res_tbl_it>0; res_tbl_it--) {
+    if(bga_set_resolution(res_tbl[res_tbl_it].w, res_tbl[res_tbl_it].h) == true) {
+      break;
+    }
+  }
+  
+  if(res_tbl_it == 0) {
     return false;
   }
   
+  bga_video_res_x = res_tbl[res_tbl_it].w;
+  bga_video_res_y = res_tbl[res_tbl_it].h;
+  
+  // get lfb addr
   const pci_entry_t *bga_dev = pci_get_device(BGA_VENDOR, BGA_DEVICE);
 
   if(bga_dev != NULL) { // LINEAR FRAMEBUFFER TAKE ME!
