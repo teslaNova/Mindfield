@@ -4860,44 +4860,5 @@ History:
 void *sbrk(size_t amount) {
   size_t pages = amount / PAGE_SIZE;
   
-  if(pages == 0) {
-    return NULL;
-  }
-  
-  if(pages == 1) {
-    return (void *)pmm_pop();
-  }
-  
-  paddr_t history[32] = {0}, base=0;
-  u8 i, j=0, m = (pmm_size() >= 32 ? 32 : pmm_size());
-  
-  --pages;
-  for(i=0; i<m; i++) {
-    history[i] = pmm_pop();
-    
-    if(i >= pages) {
-      while(j+pages <= i) {
-        if(history[j] == history[j+pages] + (PAGE_SIZE * pages)) {
-          base = history[j+pages];
-          break;
-        }
-        
-        j++;
-      }
-    }
-  }
-  
-  if(j != 0) {
-    for(i=0; i<j; i++) {
-      pmm_push(history[i]);
-    }
-  }
-  
-  for(i=j+pages; i<32; i++) {
-    if(history[i] != 0) {
-      pmm_push(history[i]);
-    }
-  }
-  
-  return (void *)base;
+  return (void *)pmm_alloc_m(pages);
 }

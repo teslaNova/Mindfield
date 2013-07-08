@@ -2,13 +2,13 @@
 #include <mm/pmm.h>
 
 #include <types.h>
+#include <utils.h>
+
 #include <multiboot.h>
 
-// currently 32-bit only
+extern void panic(void);
 
-volatile u32 *stack_top;
-volatile u32 stack_size;
-
+// CHUNKS
 struct chunk {
   paddr_t start;
   paddr_t end;
@@ -20,7 +20,7 @@ struct chunk {
 #define FIND_EMPTY_CHUNK(chunks, i) while(chunks[i].size != 0) { i++; }
 #define CALC_CHUNK_SIZE(chunk) chunk.size = chunk.end - chunk.start
 
-static void test_chunk(struct chunk *chunks, u32 *i, u32 start, u32 end) {
+void test_chunk(struct chunk *chunks, u32 *i, u32 start, u32 end) {
   u32 tmp = 0;
 
   if(chunks[*i].start < start && chunks[*i].end > start) {
@@ -52,16 +52,27 @@ static void test_chunk(struct chunk *chunks, u32 *i, u32 start, u32 end) {
   }
 }
 
+
+// BIT & DESCRIPTION MAP
+#define DEF_CONTAINER(name, type) static struct {type* tbl; u32 entries;} name;
+
+
+DEF_CONTAINER(desc, bmd_entry);
+DEF_CONTAINER(map, bm_entry);
+//DEF_CONTAINER(reserved, raddr_t);
+
+static u32 total_size = 0;
+
 void pmm_setup(paddr_t mmap, u32 len) {
   struct chunk mem_chunks[CHUNKS] = {0}; // guessing
   memory_map_t *mmap_it = (memory_map_t *)mmap;
-  u32 i=0, j, n, tmp_stack_size = 0;
+  u32 i=0, j, n, pc = 0, uc=0;
   
-  stack_size = 0;
-  stack_top = (u32 *)MEMREG_PHYS_PMM_STACK_START;
+  memset(&desc, 0, sizeof(desc));
+  memset(&map, 0, sizeof(map));
   
   if(mmap == 0 || len == 0) {
-    // panic();
+    panic();
     return;
   }
   
@@ -74,10 +85,12 @@ void pmm_setup(paddr_t mmap, u32 len) {
       j = i;
       
       test_chunk(mem_chunks, &j, MEMREG_PHYS_KERNEL_START, MEMREG_PHYS_KERNEL_END);
-      test_chunk(mem_chunks, &j, MEMREG_PHYS_VIDEO_START, MEMREG_PHYS_VIDEO_END);
+      test_chunk(mem_chunks, &j, MEMREG_PHYS_VIDEO_START, MEMREG_PHYS_VIDEO_END); // textmode.. bga?
       
       while(i < j) {
-        tmp_stack_size += mem_chunks[i++].size / PAGE_SIZE;
+        pc += mem_chunks[i++].size / PAGE_SIZE;
+        
+        if(pc) uc++;
       }
       
       FIND_EMPTY_CHUNK(mem_chunks, i);
@@ -85,36 +98,59 @@ void pmm_setup(paddr_t mmap, u32 len) {
     
     mmap_it = mmap_it + mmap_it->size + sizeof(mmap_it->size);
   }
-
-  for(i=0; i<CHUNKS; i++) {
+  
+  desc.tbl = (bmd_entry *) MEMREG_PHYS_PMM_START;
+  desc.entries = uc;
+  
+  map.tbl = (bm_entry *) (MEMREG_PHYS_PMM_START + (desc.entries * sizeof(bmd_entry)));
+  map.entries = pc / 8 + pc % 8;
+  
+  total_size = ALIGN_UP(desc.entries * sizeof(bmd_entry) + map.entries * sizeof(bm_entry));
+  
+  for(i=0; i<CHUNKS; j=++i) {
     if(mem_chunks[i].size == 0) {
       continue;
     }
     
-    j=i;
-    test_chunk(mem_chunks, &j, MEMREG_PHYS_PMM_STACK_START, MEMREG_PHYS_PMM_STACK_END(tmp_stack_size * PAGE_SIZE));
+    test_chunk(mem_chunks, &j, MEMREG_PHYS_PMM_START, MEMREG_PHYS_PMM_END(total_size));
+  }
+  
+  u32 mit = 0;
     
-    for(j=0, n=mem_chunks[i].size / PAGE_SIZE; j<n; j++) {
-      *stack_top++ = mem_chunks[i].start + (j * PAGE_SIZE);
-      stack_size ++;
+  for(i=0, j=0; i<CHUNKS; i++) {
+    if(mem_chunks[i].size == 0) {
+      continue;
+    }
+    
+    desc.tbl[j].baddr = mem_chunks[i].start;
+    desc.tbl[j].pages = mem_chunks[i].size / PAGE_SIZE;
+    
+    for(n=0; n<desc.tbl[j].pages; n++) {
+      if(n & 0xFF) {
+        mit++;
+      }
+      
+      map.tbl[mit].mask |= 1 << (n & 0xFF);
     }
   }
 }
 
-u32 pmm_pop(void) {
-  if(!stack_size) {
-    return 0;
-  }
-  
-  --stack_size;
-  return *stack_top--;
+paddr_t inline pmm_alloc(void) {
+  return pmm_alloc_m(1);
 }
 
-void pmm_push(paddr_t page) {
-  *++stack_top = page;
-  stack_size++;
+paddr_t pmm_alloc_m(u32 pc) {
+  return 0;
+}
+
+void inline pmm_free(paddr_t baddr) {
+  pmm_free_m(baddr, 1);
+}
+
+void pmm_free_m(paddr_t baddr, u32 pc) {
+  
 }
 
 u32 pmm_size(void) {
-  return stack_size;
+  return total_size / PAGE_SIZE;
 }
