@@ -120,8 +120,10 @@ void pmm_setup(paddr_t mmap_addr, u32 entries) { // todo: redo whole function. m
    uc++;
   }
 
-  uc += 1; // puffer, pmm region might be in a chunk
-  total_size = ALIGN_UP(uc * sizeof(bmd_entry) + (pc / 8 + (pc % 8 > 0 ? 1 : 0)) * sizeof(bm_entry));
+  desc.entries = uc + 1; // puffer, pmm region might be in a chunk
+  map.entries = (pc / 8 + (pc % 8 > 0 ? 1 : 0));
+
+  total_size = ALIGN_UP(desc.entries * sizeof(bmd_entry) + map.entries * sizeof(bm_entry));
 
   for(i=0; i<CHUNKS; i++) {
    if(regs[i].size < PAGE_SIZE) {
@@ -131,24 +133,31 @@ void pmm_setup(paddr_t mmap_addr, u32 entries) { // todo: redo whole function. m
    test_chunk(regs, i, MEMREG_PHYS_PMM_START, MEMREG_PHYS_PMM_END(total_size));
   }
 
-  desc.tbl = MEMREG_PHYS_PMM_START;
-  map.tbl = MEMREG_PHYS_PMM_START + sizeof(bmd_entry) * uc;
+  desc.tbl = (bmd_entry *) (MEMREG_PHYS_PMM_START);
+  map.tbl = (bm_entry *) (MEMREG_PHYS_PMM_START + sizeof(bmd_entry) * desc.entries);
+  
+  memset(desc.tbl, 0, desc.entries * sizeof(bmd_entry));
 
-  for(i=0, j=0; i<CHUNKS && j<uc; i++) {
+  for(i=0, j=0; i<CHUNKS && j<desc.entries; i++) {
    if(regs[i].size < PAGE_SIZE) {
      continue;
    }
  
-   desc.tbl[i].pages = regs[i].size / PAGE_SIZE;
-   desc.tbl[i].baddr = regs[i].start;
+   desc.tbl[j].pages = regs[i].size / PAGE_SIZE;
+   desc.tbl[j].baddr = regs[i].start;
+   
+//   k_printf("0x%08x - 0x%08x | %08x pages\n", desc.tbl[j].baddr, desc.tbl[j].pages * PAGE_SIZE + desc.tbl[j].baddr, desc.tbl[j].pages);
  
    j++;
   }
 
   desc.entries = j;
 
-  memset(map.tbl, 0xFF, (pc / 8 + (pc % 8 > 0 ? 1 : 0)) * sizeof(bm_entry));
-  memset(map.tbl + pc / 8, (1 << pc % 8) - 1, sizeof(bm_entry));
+  memset(map.tbl, 0xFF, map.entries * sizeof(bm_entry));
+
+  if(pc % 8 != 0) {
+     memset(map.tbl + (map.entries - 1) * sizeof(bm_entry), (1 << pc % 8) - 1, sizeof(bm_entry));
+  } 
 }
 
 paddr_t inline pmm_alloc(void) {
@@ -156,7 +165,54 @@ paddr_t inline pmm_alloc(void) {
 }
 
 paddr_t pmm_alloc_m(u32 pc) {
-  return 0;
+  u32 pos = 0, i=0;
+  u8 *mptr = NULL;
+  paddr_t addr = 0;
+  
+  for(u32 off=0, k=0; i<desc.entries; i++, k=0, mptr=NULL) { // todo: algo NOT optimized
+    for(u32 j=(i == 0 ? 0 : desc.tbl[i - 1].pages % 8), n=0; j<desc.tbl[i].pages && k != pc; j++) {// byte offset incorrect
+      if((j & 0x7) == 0 && j != 0) {
+        n++;
+      }
+      
+      if(k == 0) {
+        pos = j;
+        mptr = (u8 *) map.tbl + off + n;
+      }
+      
+      //k_printf("%x %x  ", *(u8 *)(map.tbl + off) , (*(u8 *)(map.tbl + off) & (1 << (j & 0x7))));
+      
+      if((*(u8 *)(map.tbl + off + n) & (1 << (j & 0x7))) == 0) {
+        k = 0;
+      } else {
+        k++;
+      }
+    }
+    
+    if(k == pc) {
+      break;
+    }
+    
+    off += desc.tbl[i].pages / 8;
+  }
+  
+  if(mptr == NULL || i == desc.entries) {
+    return 0;
+  }
+  
+  addr = desc.tbl[i].baddr + (pos * PAGE_SIZE);
+//  k_printf("\ndir: %x (pages: %04x), page: %08x, base addr: 0x%08x, addr: 0x%08x\n", i, desc.tbl[i].pages, pos, desc.tbl[i].baddr, addr);
+  
+  for(u32 i=0, j=pos & 0x7; i<pc; i++, j++) {
+    if(j == 8) {
+      j = 0;
+      mptr++;
+    }
+    
+    *mptr = *mptr & (u8)~(1 << j);
+  }
+  
+  return addr;
 }
 
 void inline pmm_free(paddr_t baddr) {
@@ -164,7 +220,29 @@ void inline pmm_free(paddr_t baddr) {
 }
 
 void pmm_free_m(paddr_t baddr, u32 pc) {
-  
+  u8 *mptr = (u8 *) map.tbl;
+
+  for(u32 i=0, off = 0; i<desc.entries; i++) {
+    if(baddr >= desc.tbl[i].baddr && baddr <= desc.tbl[i].baddr + desc.tbl[i].pages * PAGE_SIZE - 1 /* overlapping value */) {
+      u32 pos = (baddr - desc.tbl[i].baddr) / PAGE_SIZE;
+      
+      for(u32 j=pos, n=0; j<pos+pc; j++) {
+        if((j & 0x7) == 0 && j != 0) {
+          n++;
+        }
+        
+//        k_printf("bm: %d %08b -> ",n, *(u8 *)(mptr + off + n));
+        
+        *(u8 *)(mptr + off + n) |= (u8)(1 << (j & 0x7));
+        
+//        k_printf("%08b\n", *(u8 *)(mptr + off + n));
+      }
+      
+      break;
+    }
+    
+    off += desc.tbl[i].pages / 8;
+  }
 }
 
 u32 pmm_size(void) { // todo: calc real size (used, unused)
