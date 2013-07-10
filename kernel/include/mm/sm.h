@@ -7,24 +7,11 @@ typedef struct {
   u8 pl : 2;
   u16 limit_low : 14;
   u32 base_addr_low : 24;
-  
-  union {
-    struct {
-      u8 accessed : 1;
-      u8 writeable : 1;
-      u8 bottom_top : 1; // ds = 0, ss = 1
-      u8 _false : 1;
-    } data;
-    
-    struct {
-      u8 accessed : 1;
-      u8 readable : 1;
-      u8 privileged : 1;
-      u8 _true : 1;
-    } code;
-    
-    u8 mask : 4;
-  } type;
+
+  u8 accessed : 1;
+  u8 rw : 1;
+  u8 pbp : 1; // privileged as code or bottom_top for data (ds = 0, ss = 1)
+  u8 type : 1; // 1 = code, data = 0
   
   u8 cd : 1; // code or data segment = 1, system = 0
   u8 dpl : 2;
@@ -36,7 +23,7 @@ typedef struct {
   u8 granularity : 1; // 0 = up to 1 mbyte (bytewise), 1 = up to 4 gbyte (pagewise [4kb])
   
   u8 base_addr_high;
-} segment_t;
+} __attribute__ ((packed)) segment_t;
 
 enum {
   SMGD_CODE_RING0 = 0x8,
