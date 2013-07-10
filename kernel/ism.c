@@ -14,13 +14,11 @@ static u32 int_gate_size = 0;
 
 void ism_setup(void) {
   /* retrieve gate size and offset of the first gate. then update gate descriptors */
-  __asm__ (
-    "mov $_int_gate1, %%eax;"
-    "mov $_int_gate0, %%ebx;"
-    "subl %%ebx, %%eax;"
-    "mov $_int_gate0, %%ecx"
-      : "=a" (int_gate_size), "=c" (int_gate_start)
-  );
+  extern void int_gate0(void);
+  extern void int_gate1(void);
+
+  int_gate_start = int_gate0;
+  int_gate_size = int_gate1 - int_gate0;
   
   gate_t *gate = (gate_t *) (desc_tbl[DTI_IDT].base_addr);
   
