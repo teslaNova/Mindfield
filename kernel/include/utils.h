@@ -20,4 +20,12 @@ u16 inw(u16 p);
 void outl(u16 p, u32 d);
 u32 inl(u16 p);
 
+/* control register */
+u32 read_cr(u8 reg);
+void write_cr(u8 reg, u32 val);
+
+/* int control */
+void hlt(void);
+void sti(void);
+
 #endif /* UTILS_H_ */

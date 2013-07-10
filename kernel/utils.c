@@ -104,3 +104,79 @@ u32 inl(u16 p) {
   
   return d;
 }
+
+u32 read_cr(u8 reg) {
+  u32 val = 0;
+  
+  switch(reg) {
+    case 0: {
+      __asm__ volatile (
+        "mov %%cr0, %%eax"
+          : "=a"(val)
+      );
+    } break;
+    
+    case 2: {
+      __asm__ volatile (
+        "mov %%cr2, %%eax"
+          : "=a"(val)
+      );
+    } break;
+    
+    case 3: {
+      __asm__ volatile (
+        "mov %%cr3, %%eax"
+          : "=a"(val)
+      );
+    } break;
+    
+    case 4: {
+      __asm__ volatile (
+        "mov %%cr4, %%eax"
+          : "=a"(val)
+      );
+    } break;
+  }
+  
+  return val;
+}
+
+void write_cr(u8 reg, u32 val) {
+  switch(reg) {
+    case 0: {
+      __asm__ volatile (
+        "mov %%eax, %%cr0"
+          :: "a"(val)
+      );
+    } break;
+    
+    case 2: {
+      __asm__ volatile (
+        "mov %%eax, %%cr2"
+          :: "a"(val)
+      );
+    } break;
+    
+    case 3: {
+      __asm__ volatile (
+        "mov %%eax, %%cr3"
+          :: "a"(val)
+      );
+    } break;
+    
+    case 4: {
+      __asm__ volatile (
+        "mov %%eax, %%cr4"
+          :: "a"(val)
+      );
+    } break;
+  }
+}
+
+void inline hlt(void) {
+  __asm__ volatile ("hlt");
+}
+
+void inline sti(void) {
+  __asm__ volatile ("sti");
+}
