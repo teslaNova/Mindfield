@@ -13,8 +13,8 @@ typedef short i16;
 typedef int i32;
 typedef long long int i64;
 
-typedef u32 paddr_t;
-typedef u32 vaddr_t;
+typedef unsigned long paddr_t;
+typedef unsigned long vaddr_t;
 
 #define true 1
 #define false 0
@@ -22,5 +22,17 @@ typedef u32 vaddr_t;
 
 #undef size_t
 #define size_t u32
+
+#ifdef ARCH_X86
+typedef struct {
+  u32 error_code;
+  
+  u32 cr4, cr3, cr2, cr0;
+  u32 ds, es, fs, gs;
+  u32 edi, esi, ebp, old_esp, ebx, edx, ecx, eax;
+} regs_t;
+#else
+typedef struct { } regs_t;
+#endif
 
 #endif /* TYPES_H_ */
