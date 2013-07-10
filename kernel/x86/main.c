@@ -4,16 +4,25 @@
 #include <screen.h>
 #include <printf.h>
 
+#include <mm/sm.h>
 #include <mm/pmm.h>
+//#include <mm/vmm.h>
+
+//#include <cpu.h>
+//#include <ism.h>
+//#include <sched.h>
+//#include <module.h>
 
 #include <rtc.h>
 
 #include <pci.h>
 
+#include <utils.h>
+
 void panic(void) {
   k_printf("panic() called. halting.");
   
-  __asm__ volatile ("hlt");
+  hlt();
   for(;;);
 }
 
@@ -34,10 +43,10 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   }
   
   k_printf(" - initializing SM\n");
-//  sm_setup(); // segmentation manager
+  sm_setup(); // segmentation manager
   
-  k_printf("- Initializing PMM\n");
-  pmm_setup(mb_info->mmap_addr, mb_info->mmap_length);
+  k_printf(" - Initializing PMM\n");
+  pmm_setup(mb_info->mmap_addr, mb_info->mmap_length / sizeof(memory_map_t));
   
   k_printf(" - initializing VMM\n");
 //  vmm_setup();
