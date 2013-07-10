@@ -31,6 +31,8 @@ void ism_setup(void) {
     "lidt %0"
       :: "m"(desc_tbl[DTI_IDT])
   );
+  
+  /* todo: (a)pic init, sti */
 }
 
 ism_context *ism_handle(ism_context *r) {
