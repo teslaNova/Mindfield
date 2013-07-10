@@ -8,11 +8,12 @@ typedef struct {
   u16 segment_selector;
   
   u8 _res0 : 5;
-  u8 _zero : 3;
+  u8 _zero0 : 3;
 
   u8 type : 3;
   u8 big : 1; // 16-bit = 0, 32-bit = 1
   u8 dpl : 2;
+  u8 _zero1 : 1;
   u8 present : 1;
   
   u16 offset_high;

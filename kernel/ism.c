@@ -9,6 +9,8 @@
 
 #include <types.h>
 
+#include <printf.h>
+
 static u32 int_gate_start = 0;
 static u32 int_gate_size = 0;
 
@@ -24,7 +26,7 @@ void ism_setup(void) {
   
   for(u32 i=0; i<DT_I_SIZE; i++, gate++) {
     gate->offset_low = (u16) (int_gate_start + int_gate_size * i);
-    gate->offset_high = (u16) (int_gate_start + int_gate_size * i)  >> 16;
+    gate->offset_high = (u16) ((int_gate_start + int_gate_size * i)  >> 16);
   } 
   
   __asm__ volatile (
