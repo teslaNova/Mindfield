@@ -27,6 +27,7 @@ enum {
 typedef struct {
   regs_t regs;
   u32 int_no;
+  u32 error_code;
 } ism_context;
 
 void ism_setup(void);

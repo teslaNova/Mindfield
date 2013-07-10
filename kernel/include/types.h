@@ -25,8 +25,6 @@ typedef unsigned long vaddr_t;
 
 #ifdef ARCH_X86
 typedef struct {
-  u32 error_code;
-  
   u32 cr4, cr3, cr2, cr0;
   u32 ds, es, fs, gs;
   u32 edi, esi, ebp, old_esp, ebx, edx, ecx, eax;
