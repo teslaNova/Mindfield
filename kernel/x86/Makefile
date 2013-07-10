@@ -1,14 +1,15 @@
-include x86.rules
 include ../../general.rules
+include x86.rules
 
-C_SRCS=main.c
+C_SRCS=main.c descriptor.c
 ASM_SRCS=init.asm
-OBJS=init.o main.o ../mm/pmm.o ../mm/malloc.o ../utils.o ../printf.o ../screen.o ../assert.o ../rtc.o ../itoa.o ../video/bga.o ../video/tm.o ../pci.o ../font.o
+OBJS=init.o main.o descriptor.o
+OBJS_EXT=../mm/sm.o ../mm/pmm.o ../mm/malloc.o ../utils.o ../printf.o ../screen.o ../assert.o ../rtc.o ../itoa.o ../video/bga.o ../video/tm.o ../pci.o ../font.o
 
 .PHONY: all
 
 all: $(OBJS)
-	$(LD) $(LDFLAGS) -Map $(BIN_x86_MAP) -o $(BIN_x86_KRNL) $(OBJS)
+	$(LD) $(LDFLAGS) -Map $(BIN_x86_MAP) -o $(BIN_x86_KRNL) $(OBJS) $(OBJS_EXT)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@
