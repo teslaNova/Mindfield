@@ -1,7 +1,7 @@
 #ifndef X86_GATES_H_
 #define X86_GATES_H_
 
-#define DEF_INT_GATE(snum, num) __asm__ ("_int_gate" snum ": hlt;");
+#define DEF_INT_GATE(snum, num) __asm__ ("_int_gate" snum ": pusha; popa; hlt;");
 
 DEF_INT_GATE("0", 0);
 DEF_INT_GATE("1", 1);

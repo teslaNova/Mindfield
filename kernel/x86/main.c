@@ -9,7 +9,7 @@
 //#include <mm/vmm.h>
 
 //#include <cpu.h>
-//#include <ism.h>
+#include <ism.h>
 //#include <sched.h>
 //#include <module.h>
 
@@ -52,7 +52,7 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
 //  vmm_setup();
   
   k_printf(" - initializing ISM\n");
-//  ism_setup(); // interrupt service manager (ints & exceptions)
+  ism_setup(); // interrupt service manager (ints & exceptions)
   
   k_printf(" - initializing Scheduler\n");
 //  sched_setup();
