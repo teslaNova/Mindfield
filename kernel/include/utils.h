@@ -25,7 +25,10 @@ u32 read_cr(u8 reg);
 void write_cr(u8 reg, u32 val);
 
 /* int control */
-void hlt(void);
+void cli(void);
 void sti(void);
+
+/* cpu */
+void hlt(void);
 
 #endif /* UTILS_H_ */

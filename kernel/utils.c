@@ -173,10 +173,14 @@ void write_cr(u8 reg, u32 val) {
   }
 }
 
-void inline hlt(void) {
-  __asm__ volatile ("hlt");
+void inline cli(void) {
+  __asm__ volatile ("cli");
 }
 
 void inline sti(void) {
   __asm__ volatile ("sti");
+}
+
+void inline hlt(void) {
+  __asm__ volatile ("hlt");
 }
