@@ -32,3 +32,19 @@ void ism_setup(void) {
       :: "m"(desc_tbl[DTI_IDT])
   );
 }
+
+ism_context *ism_handle(ism_context *r) {
+  return r;
+}
+
+void ism_handle_irq(ism_context **r) {
+  
+}
+
+void ism_handle_exception(ism_context **r) {
+  
+}
+
+void inline ism_eoi(void) {
+  // todo: pic / apic end of interrupt response 
+}

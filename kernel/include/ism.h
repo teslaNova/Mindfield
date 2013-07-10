@@ -24,6 +24,17 @@ enum {
   ISG_TYPE_TRAP = 0b111
 };
 
+typedef struct {
+  regs_t regs;
+  u32 int_no;
+} ism_context;
+
 void ism_setup(void);
+
+ism_context *ism_handle(ism_context *r);
+void ism_handle_irq(ism_context **r);
+void ism_handle_exception(ism_context **r);
+
+void ism_eoi(void);
 
 #endif /* ISM_H_ */
