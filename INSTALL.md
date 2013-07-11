@@ -2,12 +2,13 @@ QEMU:
   apt-get? brew? emerge? ..?
   
   Ausführung in /mindfield/:
+  
     qemu-system-i386 -cdrom bin/x86/mindfield.iso -d ioport,guest_errors,unimp,pcall -vga std -monitor stdio -m 256
     
-    -vga std = Bochs Graphic Adapter (Bochs VBE Variante)
-    -monitor stdio = QEMU Konsole (Informationen, On-the-fly Einstellungen, etc.)
-    -d = Logflags
-    -m = Speicher (In Megabyte)
+  -vga std = Bochs Graphic Adapter (Bochs VBE Variante)
+  -monitor stdio = QEMU Konsole (Informationen, On-the-fly Einstellungen, etc.)
+  -d = Logflags
+  -m = Speicher (In Megabyte)
 
 Binutils (2.23):
   
