@@ -35,8 +35,13 @@
     sudo make install-gcc
     sudo make install-target-libgcc
 
+### Mindfield ###
+
+    make clean x86-all
+
 ### Infos: ###
   
   * CC/CXX ist nicht unbedingt nötig, da du dich nicht mit LLVM rumschlagen musst.
   * Ansonsten lohnt ein Blick hier rein: http://wiki.osdev.org/GCC_Cross-Compiler
+  * In bin/x86/info befindet sich eine Symboltabelle (Bei HLT oder Tripple-Fault zum Identifizieren des Störenfrieds)
 	
