@@ -7,9 +7,11 @@
 #define CPU_COUNT_MAX 16
 #define CPUID_BS 0
 
+#define CHFLG(r, b, m) (cpu[CPUID_BS].m = (r & (1 << b)) ? true : false);
+
 static cpu_t cpu[CPU_COUNT_MAX] = {0};
 static u32 cpus = 1;
-#include <printf.h>
+
 void cpu_detect(void) {
   u32 eax, ebx, ecx, edx;
   u32 max_input_basic = 0, max_input_ext = 0;
@@ -27,28 +29,42 @@ void cpu_detect(void) {
   max_input_ext = eax;
 
 _intel:  
+  /* basic information */
   CPUID(1);
   
-  /* get extended information */
+  cpu[CPUID_BS].init_apic_id = (u8)(ebx >> 24);
+  
+  if(ecx & (1 << 20)) {
+    cpu[CPUID_BS].sse = 42;
+  } else if (ecx & (1 << 19)) {
+    cpu[CPUID_BS].sse = 41;
+  } else if (ecx & (1 << 0)) {
+    cpu[CPUID_BS].sse = 30;
+  } else if(edx & (1 << 26)) {
+    cpu[CPUID_BS].sse = 20;
+  } else if (edx & (1 << 25)) {
+    cpu[CPUID_BS].sse = 10;
+  }
+
+  CHFLG(edx, 9, apic);
+  CHFLG(ecx, 21, x2apic);
+  CHFLG(edx, 0, fpu);
+  CHFLG(edx, 3, pse);
+  CHFLG(edx, 4, tsc);
+  CHFLG(edx, 5, msr);
+  CHFLG(edx, 6, pae);
+  CHFLG(edx, 23, mmx);
+  
+  /* extended information */
   /* - brand str */
   if(max_input_ext >= 0x80000004) {
-    CPUID(0x80000002); // brand sting 
-    memcpy(cpu[CPUID_BS].brand + 0, &eax, 4);
-    memcpy(cpu[CPUID_BS].brand + 4, &ebx, 4);
-    memcpy(cpu[CPUID_BS].brand + 8, &ecx, 4);
-    memcpy(cpu[CPUID_BS].brand + 12, &edx, 4);
-  
-    CPUID(0x80000003); // brand sting 
-    memcpy(cpu[CPUID_BS].brand + 16, &eax, 4);
-    memcpy(cpu[CPUID_BS].brand + 20, &ebx, 4);
-    memcpy(cpu[CPUID_BS].brand + 24, &ecx, 4);
-    memcpy(cpu[CPUID_BS].brand + 28, &edx, 4);
-  
-    CPUID(0x80000004); // brand sting 
-    memcpy(cpu[CPUID_BS].brand + 32, &eax, 4);
-    memcpy(cpu[CPUID_BS].brand + 36, &ebx, 4);
-    memcpy(cpu[CPUID_BS].brand + 40, &ecx, 4);
-    memcpy(cpu[CPUID_BS].brand + 44, &edx, 4);
+    for(u32 i=0; i<3; i++) {
+      CPUID(0x80000002 + i); // brand sting 
+      memcpy(cpu[CPUID_BS].brand + (i * 16 + 0), &eax, 4);
+      memcpy(cpu[CPUID_BS].brand + (i * 16 + 4), &ebx, 4);
+      memcpy(cpu[CPUID_BS].brand + (i * 16 + 8), &ecx, 4);
+      memcpy(cpu[CPUID_BS].brand + (i * 16 + 12), &edx, 4);
+    }
   }
   
   return;
@@ -73,4 +89,8 @@ const cpu_t *cpu_get(u32 n) {
   }
   
   return (const cpu_t *) &cpu[n];
+}
+
+inline const cpu_t * cpu_get_bs(void) { // bootstrap cpu
+  return (const cpu_t *) &cpu[CPUID_BS];
 }
