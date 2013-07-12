@@ -1,9 +1,17 @@
 #include <utils.h>
+#include <cpu.h>
 
-/* todo: 
-  cpu-check: sseX */
+#ifdef ARCH_X86
+#include <x86/sse.h>
+#endif
 
 void *memcpy(void *dest, const void *src, u32 n) {
+#ifdef ARCH_X86
+  if(cpu_get_bs()->sse >= 20) {
+    return sse_memcpy(dest, src, n);
+  }
+#endif
+  
   while(dest && src && n--) {
     *(u8*)dest++ = *(u8*)src++;
   }
@@ -17,6 +25,12 @@ void *memmove(void *dest, const void *src, u32 n) {
 }
 
 int memcmp(void *l1, void *l2, u32 len) {
+#ifdef ARCH_X86
+  if(cpu_get_bs()->sse >= 20) {
+    return sse_memcmp(l1, l2, len);
+  }
+#endif
+  
   while(l1 && l2 && len--) {
     if(*(u8*)l1 == *(u8*)l2) {
       l1++; l2++;
@@ -34,6 +48,12 @@ int memcmp(void *l1, void *l2, u32 len) {
 }
 
 const void *memchr(const void *t, u32 v, u32 n) {
+#ifdef ARCH_X86
+  if(cpu_get_bs()->sse >= 20) {
+    return sse_memchr(t, v, n);
+  }
+#endif
+  
   while(t && n--) {
     if(*(u8*)t++ == (u8)(v & 0x0FF)) {
       return t;
@@ -44,6 +64,12 @@ const void *memchr(const void *t, u32 v, u32 n) {
 }
 
 void *memset(void *dest, u32 v, u32 n) {
+#ifdef ARCH_X86
+  if(cpu_get_bs()->sse >= 20) {
+    return sse_memset(dest, v, n);
+  }
+#endif
+  
   while(dest && n--) {
     *(u8*)dest++ = (u8)(v & 0x0FF);
   }
