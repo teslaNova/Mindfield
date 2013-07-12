@@ -31,4 +31,6 @@ void sti(void);
 /* cpu */
 void hlt(void);
 
+void cpuid(u32 id, u32 *eax, u32 *ebx, u32 *ecx, u32 *edx);
+
 #endif /* UTILS_H_ */

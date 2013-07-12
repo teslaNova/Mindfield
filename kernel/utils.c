@@ -184,3 +184,10 @@ void inline sti(void) {
 void inline hlt(void) {
   __asm__ volatile ("hlt");
 }
+
+void inline cpuid(u32 id, u32 *eax, u32 *ebx, u32 *ecx, u32 *edx) {
+  register u32 ra __asm__ ("eax") = id;
+  
+  __asm__ volatile ("cpuid;"
+    : "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx));
+}
