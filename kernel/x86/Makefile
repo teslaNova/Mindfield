@@ -4,7 +4,7 @@ include x86.rules
 C_SRCS=main.c descriptor.c
 ASM_SRCS=init.asm
 OBJS=init.o $(C_SRCS:%.c=%.o)
-OBJS_EXT=../mm/sm.o ../mm/pmm.o ../mm/malloc.o ../utils.o ../printf.o ../screen.o ../assert.o ../rtc.o ../itoa.o ../video/bga.o ../video/tm.o ../pci.o ../font.o ../ism.o
+OBJS_EXT=../mm/sm.o ../mm/pmm.o ../mm/malloc.o ../utils.o ../printf.o ../screen.o ../assert.o ../rtc.o ../itoa.o ../video/bga.o ../video/tm.o ../pci.o ../font.o ../ism.o ../cpu.o
 
 .PHONY: all
 
