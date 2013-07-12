@@ -38,7 +38,7 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
 
   cpu_detect();
   
-  k_printf("CPU: %47s\n\n", cpu_get(0)->brand);
+  k_printf("CPU: %47s\n\tSSE: %1d.%1d\n\tMMX: %s\n\n", cpu_get_bs()->brand, cpu_get_bs()->sse / 10, cpu_get_bs()->sse % 10, cpu_get_bs()->mmx ? "yes" : "no");
   
   if(mb_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
     k_printf("System Halted.\n");
