@@ -236,7 +236,7 @@ void bga_putc(char c) {
     } return;
     
     case '\t': {
-      bga_video_pos_x += TAB_WIDTH;
+      bga_video_pos_x += TAB_WIDTH * font.width;
     } return;
     
     default: {
