@@ -12,22 +12,26 @@ static u32 cpus = 1;
 #include <printf.h>
 void cpu_detect(void) {
   u32 eax, ebx, ecx, edx;
-  u32 max_input = 0;
+  u32 max_input_basic = 0, max_input_ext = 0;
   
+  /* checking basic & extended max input val and vendor */
   CPUID(0);
-  max_input = eax;
-  k_printf("max input: %08x\n", max_input);
+  max_input_basic = eax;
   
   /* vendor check */
   if(ebx != *(u32 *)"Genu" || ecx != *(u32 *)"ntel" || edx != *(u32 *)"ineI") {
     goto _amd;
   }
+  
+  CPUID(0x80000000);
+  max_input_ext = eax;
 
 _intel:  
   CPUID(1);
-  k_printf("brand index: %d,  inital apic id: %d\n", ebx & 0xfF, ebx >> 24 & 0xFF);
   
-  if(max_input >= 0x80000004) {
+  /* get extended information */
+  /* - brand str */
+  if(max_input_ext >= 0x80000004) {
     CPUID(0x80000002); // brand sting 
     memcpy(cpu[CPUID_BS].brand + 0, &eax, 4);
     memcpy(cpu[CPUID_BS].brand + 4, &ebx, 4);

@@ -8,7 +8,7 @@
 #include <mm/pmm.h>
 //#include <mm/vmm.h>
 
-//#include <cpu.h>
+#include <cpu.h>
 #include <ism.h>
 //#include <sched.h>
 //#include <module.h>
@@ -35,7 +35,10 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   
   k_printf("Gathering System Information..\n");
   k_printf("Found %d PCI Devices\n\n", pci_count());
-//  cpu_detect();
+
+  cpu_detect();
+  
+  k_printf("CPU: %47s\n\n", cpu_get(0)->brand);
   
   if(mb_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
     k_printf("System Halted.\n");
@@ -56,7 +59,7 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   
   k_printf(" - initializing Scheduler\n");
 //  sched_setup();
-  
+  __asm__ ("int $0x10");
   k_printf(" - Loading Modules..\n");
   
   module_t *mod = (module_t *) mb_info->mods_addr;
