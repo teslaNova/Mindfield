@@ -7,7 +7,7 @@
 
 void *memcpy(void *dest, const void *src, u32 n) {
 #ifdef ARCH_X86
-  if(cpu_get_bs()->sse >= 20) {
+  if(cpu_get_bs()->sse >= 20 && n >= 16) {
     return sse_memcpy(dest, src, n);
   }
 #endif
@@ -26,7 +26,7 @@ void *memmove(void *dest, const void *src, u32 n) {
 
 int memcmp(void *l1, void *l2, u32 len) {
 #ifdef ARCH_X86
-  if(cpu_get_bs()->sse >= 20) {
+  if(cpu_get_bs()->sse >= 20 && len >= 16) {
     return sse_memcmp(l1, l2, len);
   }
 #endif
@@ -48,11 +48,11 @@ int memcmp(void *l1, void *l2, u32 len) {
 }
 
 const void *memchr(const void *t, u32 v, u32 n) {
-#ifdef ARCH_X86
-  if(cpu_get_bs()->sse >= 20) {
+/*#ifdef ARCH_X86
+  if(cpu_get_bs()->sse >= 20 && n >= 16) {
     return sse_memchr(t, v, n);
   }
-#endif
+#endif*/
   
   while(t && n--) {
     if(*(u8*)t++ == (u8)(v & 0x0FF)) {
@@ -65,7 +65,7 @@ const void *memchr(const void *t, u32 v, u32 n) {
 
 void *memset(void *dest, u32 v, u32 n) {
 #ifdef ARCH_X86
-  if(cpu_get_bs()->sse >= 20) {
+  if(cpu_get_bs()->sse >= 20 && n >= 16) {
     return sse_memset(dest, v, n);
   }
 #endif
