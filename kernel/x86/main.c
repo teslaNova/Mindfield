@@ -37,7 +37,6 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   k_printf("Found %d PCI Devices\n\n", pci_count());
 
   cpu_detect();
-  
   k_printf("CPU: %47s\n\tSSE: %1d.%1d\n\tMMX: %s\n\n", cpu_get_bs()->brand, cpu_get_bs()->sse / 10, cpu_get_bs()->sse % 10, cpu_get_bs()->mmx ? "yes" : "no");
   
   if(mb_magic != MULTIBOOT_BOOTLOADER_MAGIC) {
@@ -59,7 +58,7 @@ void k_main(multiboot_info_t *mb_info, u32 mb_magic) {
   
   k_printf(" - initializing Scheduler\n");
 //  sched_setup();
-  __asm__ ("int $0x10");
+
   k_printf(" - Loading Modules..\n");
   
   module_t *mod = (module_t *) mb_info->mods_addr;

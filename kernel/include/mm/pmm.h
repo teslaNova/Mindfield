@@ -43,8 +43,8 @@ typedef struct {
 } bm_entry;
 
 typedef struct {
-  paddr_t baddr : 20;
-  u16 pages : 12;
+  paddr_t baddr;
+  u16 pages;
 } bmd_entry;
 
 /*typedef struct {
@@ -56,24 +56,8 @@ typedef struct {
     u32 raw;
   };
 } raddr_t;*/
-                    
-#define BMT_GET_ENTRY(addr) bm[/* abs */(PAGE_ABS(addr) / (PAGE_SIZE * sizeof(bm_entry) * 8)]
-#define BMT_ENTRY_SIZE_UNUSED(i) (bm[i].mask & (1 << 7) +\
-                                                        bm[i].mask & (1 << 6) +\
-                                                        bm[i].mask & (1 << 5) +\
-                                                        bm[i].mask & (1 << 4) +\
-                                                        bm[i].mask & (1 << 3) +\
-                                                        bm[i].mask & (1 << 2) +\
-                                                        bm[i].mask & (1 << 1) +\
-                                                        bm[i].mask & (1 << 0))
-                                                        
-#ifdef ARCH_X86
-#define BMT_SIZE PAGE_ABS (((u32)-1) / (PAGE_SIZE  * 8))
-#elif defined(ARCH_X64)
-//#define BMT_SIZE PAGE_ABS (((u64)-1) / (PAGE_SIZE  * 8))
-#endif
 
-void pmm_setup(paddr_t mmap, u32 len);
+void pmm_setup(paddr_t mmap_addr, u32 entries);
 
 paddr_t pmm_alloc(void);
 paddr_t pmm_alloc_m(u32 pc);

@@ -277,5 +277,5 @@ void pmm_free_m(paddr_t baddr, u32 pc) {
 }
 
 u32 pmm_size(void) { // todo: calc real size (used, unused)
-  return total_size;
+  return (total_size - (sizeof(desc))) / PAGE_SIZE; // not accurate.. but nvm
 }

@@ -3,7 +3,7 @@
 #include <mm/sm.h>
 #include <ism.h>
 
-#define GATE(sel, _32bit, _type, _dpl) {.segment_selector=sel, ._zero=0, .type=_type, .big=_32bit, .dpl=_dpl, .present=1}
+#define GATE(sel, _32bit, _type, _dpl) {.segment_selector=sel, ._zero0=0, ._zero1=0, .type=_type, .big=_32bit, .dpl=_dpl, .present=1}
 #define INT_GATE(sel, _32bit, _dpl) GATE(sel, _32bit, ISG_TYPE_INT, _dpl)
 #define INT_GATE_32BIT(sel, _dpl) INT_GATE(sel, true, _dpl)
 #define INT_GATE_32BIT_RING0() INT_GATE_32BIT(SMGD_CODE_RING0, 0)

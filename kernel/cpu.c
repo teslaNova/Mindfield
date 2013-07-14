@@ -1,6 +1,9 @@
 #include <cpu.h>
-
 #include <utils.h>
+
+#ifdef ARCH_X86
+#include <x86/sse.h>
+#endif
 
 #define CPUID(id) cpuid(id, &eax, &ebx, &ecx, &edx);
 
@@ -44,6 +47,12 @@ _intel:
     cpu[CPUID_BS].sse = 20;
   } else if (edx & (1 << 25)) {
     cpu[CPUID_BS].sse = 10;
+  }
+  
+  if(cpu[CPUID_BS].sse > 0) {
+#ifdef ARCH_X86
+    sse_init();
+#endif
   }
 
   CHFLG(edx, 9, apic);
