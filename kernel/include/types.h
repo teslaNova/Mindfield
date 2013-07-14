@@ -28,12 +28,15 @@ typedef unsigned long vaddr_t;
 #endif
 
 typedef struct {
-#ifdef ARCH_X86
   u32 cr4, cr3, cr2, cr0;
   u32 ds, es, fs, gs;
+  
+#ifdef ARCH_X86
   u32 edi, esi, ebp, old_esp, ebx, edx, ecx, eax;
-#else
+#elif ARCH_X64
+  u64 rdi, rsi, rbp, old_rsp, rbx, rdx, rcx, rax;
 #endif
+  
 } regs_t;
 
 #endif /* TYPES_H_ */
