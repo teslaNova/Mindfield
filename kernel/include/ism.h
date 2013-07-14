@@ -33,9 +33,9 @@ typedef struct {
 
 void ism_setup(void);
 
-ism_context *ism_handle(ism_context *r);
-void ism_handle_irq(ism_context **r);
-void ism_handle_exception(ism_context **r);
+extern ism_context *ism_handle(ism_context *r);
+extern void ism_handle_irq(ism_context **r);
+extern void ism_handle_exception(ism_context **r);
 
 void ism_eoi(void);
 

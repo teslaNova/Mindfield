@@ -1,26 +1,36 @@
 #ifndef X86_GATES_H_
 #define X86_GATES_H_
 
+#include <mm/sm.h>
+
 #define DEF_INT_GATE(snum) __asm__ ("_int_gate" snum ": "\
                                                                 "cli;" \
-                                                                "push " snum ";" \
+                                                                "pushl $" snum ";" \
                                                                 "jmp _int_gateway;" \
                                                                 "hlt");
 
-__asm__ (
-  "_int_gateway: "
-    "pusha;" 
-    "push %gs; push %fs; push %es; push %ds;"
-    "mov %cr0, %eax; push %eax;"
-    "mov %cr2, %eax; push %eax;"
-    "mov %cr3, %eax; push %eax;"
-    "mov %cr4, %eax; push %eax;"
-    "mov %esp, %eax; push %eax;"
+__asm__  (
+  "_int_gateway: " /* r0 -> r0 */
+    "pushal;" 
+    "pushl %gs; pushl %fs; pushl %es; pushl %ds;"
+      
+    "mov %cr0, %eax; pushl %eax;"
+    "mov %cr2, %eax; pushl %eax;"
+    "mov %cr3, %eax; pushl %eax;"
+    "mov %cr4, %eax; pushl %eax;"
+    
+    "push %esp;"  
     "call _ism_handle;"
-    "add $0x14, %esp;" // esp, crX
+    "mov %eax, %esp;" // set changes made by handler
+    
+    "add $0x10, %esp;" // crX
+      
     "pop %ds; pop %es; pop %fs; pop %gs;"
-    "popa;"
+    "popal;"
+      
     "add $0x4, %esp;" // int_no
+    
+    "sti;"
     "iret;"
 );
 

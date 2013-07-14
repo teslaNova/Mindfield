@@ -1,3 +1,4 @@
+/* ism - generic */
 #include <ism.h>
 
 #ifdef ARCH_X86
@@ -6,7 +7,6 @@
 #endif
 
 #include <utils.h>
-
 #include <types.h>
 
 #include <printf.h>
@@ -35,18 +35,6 @@ void ism_setup(void) {
   );
   
   /* todo: (a)pic init, sti */
-}
-
-ism_context *ism_handle(ism_context *r) {
-  return r;
-}
-
-void ism_handle_irq(ism_context **r) {
-  
-}
-
-void ism_handle_exception(ism_context **r) {
-  
 }
 
 void inline ism_eoi(void) {

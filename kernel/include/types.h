@@ -21,16 +21,19 @@ typedef unsigned long vaddr_t;
 #define bool _Bool
 
 #undef size_t
+#if defined(ARCH_X86)
 #define size_t u32
+#elif defined(ARCH_X64)
+#define size_t u64
+#endif
 
-#ifdef ARCH_X86
 typedef struct {
+#ifdef ARCH_X86
   u32 cr4, cr3, cr2, cr0;
   u32 ds, es, fs, gs;
   u32 edi, esi, ebp, old_esp, ebx, edx, ecx, eax;
-} regs_t;
 #else
-typedef struct { } regs_t;
 #endif
+} regs_t;
 
 #endif /* TYPES_H_ */
