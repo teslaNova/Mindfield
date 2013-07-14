@@ -1,11 +1,11 @@
 #include <sse.h> // at least sse 2.0
 #include <asm.h>
 
-void sse_init(void) {
+inline void sse_init(void) {
   write_cr(4, read_cr(4) | (1 << 9)); // Intel System Programming Guide - V3 9.6 
 }
 
-void *sse_memcpy(void *dest, const void *src, u32 n) {
+inline void *sse_memcpy(void *dest, const void *src, u32 n) {
   __asm__ volatile (
     ".cpdq:"
       "movdqu (%%esi), %%xmm0;"
@@ -28,7 +28,7 @@ void *sse_memcpy(void *dest, const void *src, u32 n) {
   return dest;
 }
 
-int sse_memcmp(void *l1, void *l2, u32 len) {
+inline int sse_memcmp(void *l1, void *l2, u32 len) {
   register int *eax __asm__ ("eax");
   
   __asm__ volatile (
@@ -79,7 +79,7 @@ int sse_memcmp(void *l1, void *l2, u32 len) {
   return (int)eax;
 }
 
-const void *sse_memchr(const void *t, u32 v, u32 n) {
+inline const void *sse_memchr(const void *t, u32 v, u32 n) {
   register void *esi __asm__ ("esi") = (void *) t;
   
   __asm__ volatile (
@@ -90,7 +90,7 @@ const void *sse_memchr(const void *t, u32 v, u32 n) {
   return esi;
 }
 
-void *sse_memset(void *dest, u32 v, u32 n) {
+inline void *sse_memset(void *dest, u32 v, u32 n) {
   v &= 0xFF;
   v = v | (v << 8) | (v << 16) | (v << 24);
   u32 v128[4] = {v,v,v,v};
